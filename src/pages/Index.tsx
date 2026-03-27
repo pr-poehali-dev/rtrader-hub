@@ -443,80 +443,75 @@ function MiniDashboard() {
 }
 
 function SectionCarousel() {
-  const [active, setActive] = useState(1);
+  const [active, setActive] = useState(0);
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
   const startX = useRef(0);
   const scrollStart = useRef(0);
-  const autoplayRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const autoplayActive = useRef(false);
-  const userActionCooldown = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const pausedRef = useRef(false);      // true = пауза (hover карточки / drag)
+  const cooldownRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const activeRef = useRef(0);          // синхронная копия active для interval
   const cardW = 280;
   const gap = 16;
 
-  const scrollTo = useCallback((idx: number) => {
-    setActive(idx);
+  const scrollToIdx = useCallback((idx: number, smooth = true) => {
+    const next = ((idx % SECTIONS.length) + SECTIONS.length) % SECTIONS.length;
+    activeRef.current = next;
+    setActive(next);
     const container = containerRef.current;
     if (!container) return;
-    const offset = idx * (cardW + gap) - container.clientWidth / 2 + cardW / 2;
-    container.scrollTo({ left: Math.max(0, offset), behavior: "smooth" });
+    const offset = next * (cardW + gap) - container.clientWidth / 2 + cardW / 2;
+    container.scrollTo({ left: Math.max(0, offset), behavior: smooth ? "smooth" : "auto" });
   }, []);
 
-  const stopAutoplay = useCallback(() => {
-    if (autoplayRef.current) {
-      clearInterval(autoplayRef.current);
-      autoplayRef.current = null;
-    }
+  // Запуск / остановка таймера
+  const stopTimer = useCallback(() => {
+    if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
   }, []);
 
-  const startAutoplay = useCallback(() => {
-    if (autoplayRef.current) return;
-    autoplayRef.current = setInterval(() => {
-      setActive(prev => {
-        const next = (prev + 1) % SECTIONS.length;
-        const container = containerRef.current;
-        if (container) {
-          const offset = next * (cardW + gap) - container.clientWidth / 2 + cardW / 2;
-          container.scrollTo({ left: Math.max(0, offset), behavior: "smooth" });
-        }
-        return next;
-      });
+  const startTimer = useCallback(() => {
+    stopTimer();
+    timerRef.current = setInterval(() => {
+      if (!pausedRef.current) {
+        scrollToIdx(activeRef.current + 1);
+      }
     }, 3500);
-  }, []);
+  }, [stopTimer, scrollToIdx]);
 
-  const onWrapperEnter = () => {
-    autoplayActive.current = true;
-    if (hoveredCard === null && !isDragging.current) startAutoplay();
-  };
+  // Автоплей стартует сразу при монтировании
+  useEffect(() => {
+    startTimer();
+    return () => {
+      stopTimer();
+      if (cooldownRef.current) clearTimeout(cooldownRef.current);
+    };
+  }, [startTimer, stopTimer]);
 
-  const onWrapperLeave = () => {
-    autoplayActive.current = false;
-    stopAutoplay();
-  };
-
+  // Пауза при hover карточки
   const onCardEnter = (i: number) => {
     setHoveredCard(i);
-    stopAutoplay();
+    pausedRef.current = true;
   };
-
   const onCardLeave = () => {
     setHoveredCard(null);
-    if (autoplayActive.current && !isDragging.current) startAutoplay();
+    pausedRef.current = false;
   };
 
-  const triggerUserAction = () => {
-    stopAutoplay();
-    if (userActionCooldown.current) clearTimeout(userActionCooldown.current);
-    userActionCooldown.current = setTimeout(() => {
-      if (autoplayActive.current) startAutoplay();
-    }, 2000);
+  // Временная пауза при ручном действии (стрелки, drag)
+  const pauseTemporary = () => {
+    pausedRef.current = true;
+    if (cooldownRef.current) clearTimeout(cooldownRef.current);
+    cooldownRef.current = setTimeout(() => {
+      if (!isDragging.current) pausedRef.current = false;
+    }, 2500);
   };
 
   const prev = () => {
-    triggerUserAction();
-    scrollTo(Math.max(0, active - 1));
+    pauseTemporary();
+    scrollToIdx(activeRef.current - 1);
   };
   const next = () => {
     triggerUserAction();
@@ -527,26 +522,23 @@ function SectionCarousel() {
     isDragging.current = true;
     startX.current = e.pageX;
     scrollStart.current = e.currentTarget.scrollLeft;
-    stopAutoplay();
+    pauseTemporary();
   };
   const onMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!isDragging.current) return;
     e.currentTarget.scrollLeft = scrollStart.current - (e.pageX - startX.current);
   };
   const onMouseUp = () => {
-    isDragging.current = false;
-    if (userActionCooldown.current) clearTimeout(userActionCooldown.current);
-    userActionCooldown.current = setTimeout(() => {
-      if (autoplayActive.current && hoveredCard === null) startAutoplay();
-    }, 2000);
+    if (isDragging.current) {
+      isDragging.current = false;
+      pauseTemporary();
+    }
   };
 
-  useEffect(() => {
-    return () => {
-      stopAutoplay();
-      if (userActionCooldown.current) clearTimeout(userActionCooldown.current);
-    };
-  }, [stopAutoplay]);
+  const next = () => {
+    pauseTemporary();
+    scrollToIdx(activeRef.current + 1);
+  };
 
   const navigateTo = (section: (typeof SECTIONS)[0]) => {
     if (section.isVip) {
@@ -558,7 +550,7 @@ function SectionCarousel() {
   };
 
   return (
-    <div ref={wrapperRef} className="relative" onMouseEnter={onWrapperEnter} onMouseLeave={onWrapperLeave}>
+    <div ref={wrapperRef} className="relative">
       <div
         ref={containerRef}
         className="overflow-x-auto scrollbar-hide pb-4 cursor-grab active:cursor-grabbing"
@@ -575,7 +567,7 @@ function SectionCarousel() {
             return (
               <div
                 key={s.id}
-                onClick={() => { triggerUserAction(); setActive(i); }}
+                onClick={() => { pauseTemporary(); scrollToIdx(i); }}
                 onMouseEnter={() => onCardEnter(i)}
                 onMouseLeave={onCardLeave}
                 className="carousel-card flex-shrink-0 flex flex-col gap-4 p-6 cursor-pointer select-none"
@@ -617,13 +609,13 @@ function SectionCarousel() {
       </div>
 
       <div className="flex items-center justify-center gap-4 mt-5">
-        <button onClick={prev} disabled={active === 0}
-          className="w-9 h-9 rounded-full glass-card flex items-center justify-center text-white/50 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all">
+        <button onClick={prev}
+          className="w-9 h-9 rounded-full glass-card flex items-center justify-center text-white/50 hover:text-white transition-all">
           <Icon name="ChevronLeft" size={16} />
         </button>
         <div className="flex gap-2 items-center">
           {SECTIONS.map((_, i) => (
-            <button key={i} onClick={() => { triggerUserAction(); scrollTo(i); }}
+            <button key={i} onClick={() => { pauseTemporary(); scrollToIdx(i); }}
               className="rounded-full transition-all duration-300"
               style={{
                 width: i === active ? 18 : 6,
@@ -633,8 +625,8 @@ function SectionCarousel() {
             />
           ))}
         </div>
-        <button onClick={next} disabled={active === SECTIONS.length - 1}
-          className="w-9 h-9 rounded-full glass-card flex items-center justify-center text-white/50 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-all">
+        <button onClick={next}
+          className="w-9 h-9 rounded-full glass-card flex items-center justify-center text-white/50 hover:text-white transition-all">
           <Icon name="ChevronRight" size={16} />
         </button>
       </div>
