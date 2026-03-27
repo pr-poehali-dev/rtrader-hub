@@ -369,6 +369,37 @@
   backdrop-filter: blur(20px);
 }
 
+/* Review card */
+.review-card {
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 1rem;
+  transition: all 0.3s ease;
+}
+
+.review-card:hover {
+  border-color: rgba(155, 48, 255, 0.3);
+  box-shadow: 0 4px 24px rgba(155, 48, 255, 0.12);
+  transform: translateY(-2px);
+}
+
+/* Screenshot card */
+.screenshot-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(155, 48, 255, 0.2);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.screenshot-card:hover {
+  box-shadow:
+    0 0 24px rgba(155, 48, 255, 0.2),
+    0 0 48px rgba(0, 229, 255, 0.1);
+  transform: translateY(-3px);
+}
+
 /* Carousel card */
 .carousel-card {
   background: rgba(255, 255, 255, 0.04);

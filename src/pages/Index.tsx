@@ -155,6 +155,51 @@ const SECTIONS = [
   },
 ];
 
+const REVIEWS_TEXT = [
+  {
+    name: "Алексей М.",
+    status: "VIP-клуб",
+    badge: "vip",
+    text: "Торгую фьючерсами уже год после обучения здесь. Самое ценное — живые разборы сделок и честный взгляд на риски. Без воды и пустых обещаний. Автор объясняет не «как стать миллионером», а как не потерять то, что есть.",
+  },
+  {
+    name: "Дмитрий К.",
+    status: "Участник комьюнити",
+    badge: "community",
+    text: "Нашёл RTrader когда уже слил депозит дважды. Рефлексии трейдера — это отдельная история: читал как книгу про себя. Понял, что проблема была не в стратегии, а в психологии. Рекомендую всем новичкам.",
+  },
+  {
+    name: "Марина С.",
+    status: "VIP-клуб",
+    badge: "vip",
+    text: "Подписалась на VIP скептически. Оказалось — реально работающие сигналы с объяснением логики. Теперь не просто копирую, а понимаю, почему именно эта точка входа. Это меняет всё.",
+  },
+  {
+    name: "Павел Н.",
+    status: "Участник комьюнити",
+    badge: "community",
+    text: "Комьюнити живое и полезное. Обсуждаем сделки в реальном времени, помогаем друг другу разбирать ошибки. Нет токсичности, нет хайпа. Просто трейдеры, которые хотят расти.",
+  },
+  {
+    name: "Виктор О.",
+    status: "VIP-клуб",
+    badge: "vip",
+    text: "Участвовал в первом турнире — занял 3-е место. Честная оценка стратегий, без подтасовок. А главное — разбор итогов от автора. Такого не найти больше нигде бесплатно.",
+  },
+  {
+    name: "Татьяна Р.",
+    status: "Участник комьюнити",
+    badge: "community",
+    text: "Аналитика по нефти и золоту — просто находка. Раньше ориентировалась только на новости, теперь понимаю теханализ. Уровни, которые публикуются, реально работают на графике.",
+  },
+];
+
+const REVIEWS_SCREENSHOTS = [
+  { id: 1, placeholder: true, label: "Отзыв из чата #1" },
+  { id: 2, placeholder: true, label: "Отзыв из чата #2" },
+  { id: 3, placeholder: true, label: "Отзыв из чата #3" },
+];
+
 const ECOSYSTEM = [
   { name: "Telegram", icon: "Send", url: TG_URL, color: "#00E5FF" },
   { name: "Dzen", icon: "Newspaper", url: "https://dzen.ru", color: "#FF8C00" },
@@ -184,6 +229,102 @@ const FAQ_ITEMS = [
     a: "Всё основное живёт здесь, на rtrader11.ru. Telegram-канал дублирует публикации. Dzen, VK и RuTube — часть экосистемы, там появляется дополнительный контент.",
   },
 ];
+
+function ReviewsSection() {
+  const [lightbox, setLightbox] = useState<number | null>(null);
+
+  return (
+    <section id="reviews">
+      <Reveal>
+        <div className="glass-card p-8 md:p-10">
+          <div className="text-xs text-white/25 uppercase tracking-widest font-semibold mb-2">Что говорят участники</div>
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+            <h2 className="font-russo text-2xl md:text-3xl text-white">Отзывы</h2>
+            <p className="text-white/35 text-sm font-light max-w-sm">
+              Реальные отклики участников комьюнити и VIP-клуба
+            </p>
+          </div>
+
+          {/* Текстовые отзывы */}
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-10">
+            {REVIEWS_TEXT.map((r, i) => (
+              <div key={i} className="review-card p-5 flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-full brand-gradient-bg flex items-center justify-center text-black font-russo text-xs font-black">
+                      {r.name[0]}
+                    </div>
+                    <div>
+                      <div className="text-sm font-semibold text-white/85">{r.name}</div>
+                      <div className="text-xs text-white/35">{r.status}</div>
+                    </div>
+                  </div>
+                  <span className={`text-xs px-2 py-0.5 rounded-full font-semibold ${r.badge === "vip" ? "bg-[#FF2D78]/15 text-[#FF2D78] border border-[#FF2D78]/30" : "bg-[#00E5FF]/10 text-[#00E5FF] border border-[#00E5FF]/25"}`}>
+                    {r.badge === "vip" ? "VIP" : "Комьюнити"}
+                  </span>
+                </div>
+                <div className="flex gap-0.5 mb-1">
+                  {[...Array(5)].map((_, s) => (
+                    <Icon key={s} name="Star" size={12} style={{ color: "#FFD700", fill: "#FFD700" }} />
+                  ))}
+                </div>
+                <p className="text-white/55 text-sm leading-relaxed font-light flex-1">{r.text}</p>
+              </div>
+            ))}
+          </div>
+
+          {/* Скриншоты из Telegram */}
+          <div className="border-t border-white/8 pt-8">
+            <div className="text-xs text-white/25 uppercase tracking-widest font-semibold mb-4">Скриншоты из чата</div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {REVIEWS_SCREENSHOTS.map((s) => (
+                <button
+                  key={s.id}
+                  onClick={() => setLightbox(s.id)}
+                  className="screenshot-card group relative overflow-hidden rounded-xl aspect-[4/3] flex items-center justify-center"
+                >
+                  {/* Placeholder — заменить на реальный img src */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#9B30FF]/8 to-[#00E5FF]/8" />
+                  <div className="relative z-10 flex flex-col items-center gap-3 text-white/30 group-hover:text-white/60 transition-colors">
+                    <Icon name="MessageSquare" size={32} />
+                    <span className="text-xs font-semibold">{s.label}</span>
+                    <span className="text-xs opacity-60">Нажмите для просмотра</span>
+                  </div>
+                  <div className="absolute inset-0 border border-[#9B30FF]/20 group-hover:border-[#9B30FF]/50 rounded-xl transition-colors" />
+                </button>
+              ))}
+            </div>
+            <p className="text-white/20 text-xs mt-3 font-light">
+              * Для добавления реальных скриншотов — замените placeholder-блоки на <code className="text-white/35">&lt;img&gt;</code> с нужными URL
+            </p>
+          </div>
+        </div>
+      </Reveal>
+
+      {/* Лайтбокс */}
+      {lightbox !== null && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4"
+          onClick={() => setLightbox(null)}
+        >
+          <div className="glass-card p-8 max-w-lg w-full text-center" onClick={(e) => e.stopPropagation()}>
+            <div className="text-white/40 text-sm mb-4">Скриншот #{lightbox}</div>
+            <div className="aspect-[4/3] bg-gradient-to-br from-[#9B30FF]/10 to-[#00E5FF]/10 rounded-xl flex items-center justify-center mb-4">
+              <div className="flex flex-col items-center gap-3 text-white/30">
+                <Icon name="MessageSquare" size={48} />
+                <span className="text-sm">Место для скриншота из чата</span>
+              </div>
+            </div>
+            <button onClick={() => setLightbox(null)}
+              className="neon-btn-outline text-sm px-6 py-2">
+              Закрыть
+            </button>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
 
 function useIntersection(ref: React.RefObject<Element>) {
   const [visible, setVisible] = useState(false);
@@ -572,196 +713,188 @@ export default function Index() {
 
       {/* HERO */}
       <section id="hero" className="relative min-h-screen flex flex-col justify-center overflow-hidden pt-24">
-        {/* Moscow skyline SVG background */}
-        <div className="absolute inset-0 flex items-end justify-center pointer-events-none overflow-hidden">
+        {/* Moscow skyline — большой, смещён вправо, не мешает тексту */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden">
           <svg
-            viewBox="0 0 1440 520"
-            preserveAspectRatio="xMidYMax slice"
-            className="w-full absolute bottom-0"
-            style={{ opacity: 0.18, filter: "blur(0.5px)" }}
+            viewBox="0 0 1000 700"
+            preserveAspectRatio="xMaxYMax meet"
+            className="absolute bottom-0 right-0 h-[85%] w-auto"
+            style={{ opacity: 0.28 }}
             xmlns="http://www.w3.org/2000/svg"
           >
             <defs>
-              <linearGradient id="neonViolet" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#9B30FF" stopOpacity="1" />
-                <stop offset="100%" stopColor="#9B30FF" stopOpacity="0.2" />
-              </linearGradient>
-              <linearGradient id="neonCyan" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#00E5FF" stopOpacity="1" />
-                <stop offset="100%" stopColor="#00E5FF" stopOpacity="0.2" />
-              </linearGradient>
-              <linearGradient id="neonPink" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#FF2D78" stopOpacity="1" />
-                <stop offset="100%" stopColor="#FF2D78" stopOpacity="0.2" />
-              </linearGradient>
-              <filter id="glow">
-                <feGaussianBlur stdDeviation="2" result="blur" />
+              <filter id="svgGlow" x="-30%" y="-30%" width="160%" height="160%">
+                <feGaussianBlur stdDeviation="3.5" result="blur" />
                 <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
               </filter>
+              <filter id="svgGlowStrong" x="-40%" y="-40%" width="180%" height="180%">
+                <feGaussianBlur stdDeviation="6" result="blur" />
+                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+              <linearGradient id="skyFade" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#06051a" stopOpacity="0"/>
+                <stop offset="85%" stopColor="#06051a" stopOpacity="0"/>
+                <stop offset="100%" stopColor="#06051a" stopOpacity="0.7"/>
+              </linearGradient>
             </defs>
 
-            {/* ===== КРЕМЛЬ - центр ===== */}
-            {/* Главная Спасская башня */}
-            <g filter="url(#glow)" stroke="#9B30FF" strokeWidth="1.5" fill="none">
-              {/* Тело башни */}
-              <rect x="680" y="300" width="48" height="140" stroke="#9B30FF" fill="#9B30FF" fillOpacity="0.08"/>
-              {/* Ярус 2 */}
-              <rect x="688" y="268" width="32" height="36" fill="#9B30FF" fillOpacity="0.1"/>
-              {/* Ярус 3 */}
-              <rect x="694" y="242" width="20" height="30" fill="#9B30FF" fillOpacity="0.1"/>
-              {/* Звёздный шпиль */}
-              <line x1="704" y1="242" x2="704" y2="195"/>
-              <polygon points="704,188 708,202 720,202 710,210 714,224 704,216 694,224 698,210 688,202 700,202" fill="#FF2D78" fillOpacity="0.7" stroke="#FF2D78"/>
-              {/* Часы */}
-              <circle cx="704" cy="280" r="8" stroke="#FFD700" strokeWidth="1" fill="none"/>
-              <line x1="704" y1="276" x2="704" y2="280" stroke="#FFD700"/>
-              <line x1="704" y1="280" x2="707" y2="283" stroke="#FFD700"/>
-              {/* Арка */}
-              <path d="M688,440 L688,380 Q704,360 720,380 L720,440" fill="#9B30FF" fillOpacity="0.15"/>
+            {/* ======= ПОКРОВСКИЙ СОБОР (Василий Блаженный) — главный акцент, центр ======= */}
+            <g filter="url(#svgGlowStrong)">
+              {/* Основание / платформа */}
+              <rect x="320" y="530" width="340" height="170" fill="#00E5FF" fillOpacity="0.06" stroke="#00E5FF" strokeWidth="1.5" strokeOpacity="0.5"/>
+
+              {/* Центральная высокая башня */}
+              <rect x="450" y="350" width="80" height="185" fill="#00E5FF" fillOpacity="0.08" stroke="#00E5FF" strokeWidth="2" strokeOpacity="0.8"/>
+              {/* Центральный луковичный купол — большой */}
+              <ellipse cx="490" cy="310" rx="50" ry="65" fill="#00E5FF" fillOpacity="0.1" stroke="#00E5FF" strokeWidth="2.5" strokeOpacity="0.9"/>
+              {/* Рёбра купола */}
+              <path d="M490,245 Q510,270 490,310 Q470,270 490,245" fill="none" stroke="#00E5FF" strokeWidth="1" strokeOpacity="0.5"/>
+              <path d="M490,245 Q518,280 500,318" fill="none" stroke="#00E5FF" strokeWidth="0.8" strokeOpacity="0.35"/>
+              <path d="M490,245 Q462,280 480,318" fill="none" stroke="#00E5FF" strokeWidth="0.8" strokeOpacity="0.35"/>
+              {/* Шпиль и крест */}
+              <line x1="490" y1="245" x2="490" y2="195" stroke="#00E5FF" strokeWidth="2" strokeOpacity="0.9"/>
+              {/* Православный крест */}
+              <line x1="480" y1="200" x2="500" y2="200" stroke="#FFD700" strokeWidth="3" strokeOpacity="1"/>
+              <line x1="490" y1="193" x2="490" y2="215" stroke="#FFD700" strokeWidth="3" strokeOpacity="1"/>
+              <line x1="482" y1="208" x2="498" y2="208" stroke="#FFD700" strokeWidth="2" strokeOpacity="0.8"/>
+              {/* Нижняя косая перекладина */}
+              <line x1="483" y1="213" x2="497" y2="207" stroke="#FFD700" strokeWidth="1.5" strokeOpacity="0.7"/>
+
+              {/* Башня 2 — левая крупная */}
+              <rect x="370" y="400" width="60" height="135" fill="#00E5FF" fillOpacity="0.07" stroke="#00E5FF" strokeWidth="1.8" strokeOpacity="0.7"/>
+              <ellipse cx="400" cy="378" rx="36" ry="46" fill="#00E5FF" fillOpacity="0.09" stroke="#00E5FF" strokeWidth="2" strokeOpacity="0.8"/>
+              <path d="M400,332 Q415,350 400,378 Q385,350 400,332" fill="none" stroke="#00E5FF" strokeWidth="1" strokeOpacity="0.45"/>
+              <line x1="400" y1="332" x2="400" y2="300" stroke="#00E5FF" strokeWidth="1.5"/>
+              <line x1="394" y1="305" x2="406" y2="305" stroke="#FFD700" strokeWidth="2.5" strokeOpacity="0.95"/>
+              <line x1="400" y1="298" x2="400" y2="312" stroke="#FFD700" strokeWidth="2.5" strokeOpacity="0.95"/>
+              <line x1="395" y1="309" x2="405" y2="309" stroke="#FFD700" strokeWidth="1.5" strokeOpacity="0.7"/>
+
+              {/* Башня 3 — правая крупная */}
+              <rect x="550" y="400" width="60" height="135" fill="#00E5FF" fillOpacity="0.07" stroke="#00E5FF" strokeWidth="1.8" strokeOpacity="0.7"/>
+              <ellipse cx="580" cy="378" rx="36" ry="46" fill="#00E5FF" fillOpacity="0.09" stroke="#00E5FF" strokeWidth="2" strokeOpacity="0.8"/>
+              <path d="M580,332 Q595,350 580,378 Q565,350 580,332" fill="none" stroke="#00E5FF" strokeWidth="1" strokeOpacity="0.45"/>
+              <line x1="580" y1="332" x2="580" y2="300" stroke="#00E5FF" strokeWidth="1.5"/>
+              <line x1="574" y1="305" x2="586" y2="305" stroke="#FFD700" strokeWidth="2.5" strokeOpacity="0.95"/>
+              <line x1="580" y1="298" x2="580" y2="312" stroke="#FFD700" strokeWidth="2.5" strokeOpacity="0.95"/>
+              <line x1="575" y1="309" x2="585" y2="309" stroke="#FFD700" strokeWidth="1.5" strokeOpacity="0.7"/>
+
+              {/* Башня 4 — маленькая левая */}
+              <rect x="328" y="460" width="38" height="75" fill="#00E5FF" fillOpacity="0.06" stroke="#00E5FF" strokeWidth="1.5" strokeOpacity="0.6"/>
+              <ellipse cx="347" cy="447" rx="22" ry="28" fill="#00E5FF" fillOpacity="0.07" stroke="#00E5FF" strokeWidth="1.5" strokeOpacity="0.65"/>
+              <line x1="347" y1="419" x2="347" y2="395" stroke="#00E5FF" strokeWidth="1.2"/>
+              <line x1="342" y1="399" x2="352" y2="399" stroke="#FFD700" strokeWidth="2" strokeOpacity="0.9"/>
+              <line x1="347" y1="394" x2="347" y2="404" stroke="#FFD700" strokeWidth="2" strokeOpacity="0.9"/>
+
+              {/* Башня 5 — маленькая правая */}
+              <rect x="614" y="460" width="38" height="75" fill="#00E5FF" fillOpacity="0.06" stroke="#00E5FF" strokeWidth="1.5" strokeOpacity="0.6"/>
+              <ellipse cx="633" cy="447" rx="22" ry="28" fill="#00E5FF" fillOpacity="0.07" stroke="#00E5FF" strokeWidth="1.5" strokeOpacity="0.65"/>
+              <line x1="633" y1="419" x2="633" y2="395" stroke="#00E5FF" strokeWidth="1.2"/>
+              <line x1="628" y1="399" x2="638" y2="399" stroke="#FFD700" strokeWidth="2" strokeOpacity="0.9"/>
+              <line x1="633" y1="394" x2="633" y2="404" stroke="#FFD700" strokeWidth="2" strokeOpacity="0.9"/>
+
+              {/* Декоративные арки основания */}
+              <path d="M340,530 Q380,510 420,530" fill="none" stroke="#00E5FF" strokeWidth="1.5" strokeOpacity="0.5"/>
+              <path d="M440,530 Q490,505 540,530" fill="none" stroke="#00E5FF" strokeWidth="1.5" strokeOpacity="0.5"/>
+              <path d="M560,530 Q600,510 640,530" fill="none" stroke="#00E5FF" strokeWidth="1.5" strokeOpacity="0.5"/>
             </g>
 
-            {/* Никольская башня - левее */}
-            <g filter="url(#glow)" stroke="#9B30FF" strokeWidth="1.2" fill="none">
-              <rect x="620" y="320" width="38" height="120" fill="#9B30FF" fillOpacity="0.07"/>
-              <rect x="626" y="295" width="26" height="30" fill="#9B30FF" fillOpacity="0.09"/>
-              <rect x="631" y="272" width="16" height="26" fill="#9B30FF" fillOpacity="0.1"/>
-              {/* Готический шпиль */}
-              <polygon points="639,272 645,285 651,272 651,265 645,255 639,265" fill="#9B30FF" fillOpacity="0.2"/>
-              <line x1="645" y1="255" x2="645" y2="215"/>
-              <polygon points="645,208 650,220 656,220 651,226 653,234 645,229 637,234 639,226 634,220 640,220" fill="#FF2D78" fillOpacity="0.6" stroke="#FF2D78" strokeWidth="0.8"/>
-            </g>
-
-            {/* Боровицкая башня */}
-            <g stroke="#9B30FF" strokeWidth="1" fill="none">
-              <rect x="748" y="330" width="34" height="110" fill="#9B30FF" fillOpacity="0.06"/>
-              <rect x="753" y="308" width="24" height="26" fill="#9B30FF" fillOpacity="0.08"/>
-              <line x1="765" y1="308" x2="765" y2="268"/>
-              <polygon points="765,262 770,275 776,275 771,281 773,289 765,284 757,289 759,281 754,275 760,275" fill="#FF2D78" fillOpacity="0.55" stroke="#FF2D78" strokeWidth="0.8"/>
-            </g>
-
-            {/* Кремлёвская стена */}
-            <g stroke="#9B30FF" strokeWidth="1.5" fill="none">
-              <path d="M580,440 L580,390 L620,390 L620,440" fill="#9B30FF" fillOpacity="0.05"/>
-              {/* Зубцы */}
-              {[580,590,600,610].map(x => (
-                <rect key={x} x={x} y={382} width="6" height="10" fill="#9B30FF" fillOpacity="0.2" stroke="#9B30FF"/>
+            {/* ======= СПАССКАЯ БАШНЯ — левее Покровского ======= */}
+            <g filter="url(#svgGlow)">
+              {/* Стена кремля */}
+              <rect x="150" y="540" width="220" height="160" fill="#9B30FF" fillOpacity="0.05" stroke="#9B30FF" strokeWidth="1.5" strokeOpacity="0.4"/>
+              {/* Зубцы стены */}
+              {[150,166,182,198,214,230,246,262,278,294,310,326,342,358].map((x) => (
+                <rect key={x} x={x} y={526} width="10" height="16" fill="#9B30FF" fillOpacity="0.15" stroke="#9B30FF" strokeWidth="1" strokeOpacity="0.5"/>
               ))}
-              <path d="M750,440 L750,390 L800,390 L800,440" fill="#9B30FF" fillOpacity="0.05"/>
-              {[750,760,770,780,790].map(x => (
-                <rect key={x} x={x} y={382} width="6" height="10" fill="#9B30FF" fillOpacity="0.2" stroke="#9B30FF"/>
-              ))}
-            </g>
 
-            {/* ===== ПОКРОВСКИЙ СОБОР (Василий Блаженный) - правее Кремля ===== */}
-            <g filter="url(#glow)" stroke="#00E5FF" strokeWidth="1.2" fill="none">
-              {/* Центральная башня */}
-              <rect x="850" y="310" width="36" height="130" fill="#00E5FF" fillOpacity="0.06"/>
-              {/* Луковичный купол центр */}
-              <ellipse cx="868" cy="295" rx="22" ry="30" fill="#00E5FF" fillOpacity="0.08" stroke="#00E5FF"/>
-              <path d="M846,295 Q868,258 890,295" fill="#00E5FF" fillOpacity="0.12"/>
-              <line x1="868" y1="265" x2="868" y2="238"/>
-              {/* Крест */}
-              <line x1="864" y1="238" x2="872" y2="238" stroke="#FFD700" strokeWidth="1.5"/>
-              <line x1="868" y1="234" x2="868" y2="242" stroke="#FFD700" strokeWidth="1.5"/>
-              <line x1="865" y1="240" x2="871" y2="240" stroke="#FFD700" strokeWidth="1"/>
+              {/* Тело башни — 3 яруса */}
+              <rect x="218" y="370" width="100" height="175" fill="#9B30FF" fillOpacity="0.1" stroke="#9B30FF" strokeWidth="2.5" strokeOpacity="0.85"/>
+              <rect x="228" y="320" width="80" height="55" fill="#9B30FF" fillOpacity="0.1" stroke="#9B30FF" strokeWidth="2" strokeOpacity="0.75"/>
+              <rect x="238" y="280" width="60" height="44" fill="#9B30FF" fillOpacity="0.1" stroke="#9B30FF" strokeWidth="2" strokeOpacity="0.7"/>
+              <rect x="248" y="248" width="40" height="36" fill="#9B30FF" fillOpacity="0.12" stroke="#9B30FF" strokeWidth="2" strokeOpacity="0.8"/>
 
-              {/* Боковая башня 1 */}
-              <rect x="820" y="340" width="24" height="100" fill="#00E5FF" fillOpacity="0.05"/>
-              <ellipse cx="832" cy="328" rx="14" ry="18" fill="#00E5FF" fillOpacity="0.07" stroke="#00E5FF" strokeWidth="1"/>
-              <path d="M818,328 Q832,308 846,328" fill="#00E5FF" fillOpacity="0.1"/>
-              <line x1="832" y1="310" x2="832" y2="290"/>
-              <line x1="829" y1="290" x2="835" y2="290" stroke="#FFD700"/>
-              <line x1="832" y1="287" x2="832" y2="293" stroke="#FFD700"/>
+              {/* Часы — крупнее */}
+              <circle cx="268" cy="340" r="20" stroke="#FFD700" strokeWidth="2.5" fill="#9B30FF" fillOpacity="0.15" strokeOpacity="0.95"/>
+              <circle cx="268" cy="340" r="16" stroke="#FFD700" strokeWidth="1" fill="none" strokeOpacity="0.4"/>
+              <line x1="268" y1="326" x2="268" y2="340" stroke="#FFD700" strokeWidth="2" strokeOpacity="0.9"/>
+              <line x1="268" y1="340" x2="276" y2="348" stroke="#FFD700" strokeWidth="2" strokeOpacity="0.9"/>
 
-              {/* Боковая башня 2 */}
-              <rect x="892" y="340" width="24" height="100" fill="#00E5FF" fillOpacity="0.05"/>
-              <ellipse cx="904" cy="328" rx="14" ry="18" fill="#00E5FF" fillOpacity="0.07" stroke="#00E5FF" strokeWidth="1"/>
-              <path d="M890,328 Q904,308 918,328" fill="#00E5FF" fillOpacity="0.1"/>
-              <line x1="904" y1="310" x2="904" y2="290"/>
-              <line x1="901" y1="290" x2="907" y2="290" stroke="#FFD700"/>
-              <line x1="904" y1="287" x2="904" y2="293" stroke="#FFD700"/>
+              {/* Шпиль */}
+              <line x1="268" y1="248" x2="268" y2="185" stroke="#9B30FF" strokeWidth="2.5" strokeOpacity="0.9"/>
+              {/* Рубиновая звезда */}
+              <polygon points="268,172 274,188 290,188 278,198 282,214 268,204 254,214 258,198 246,188 262,188"
+                fill="#FF2D78" fillOpacity="0.85" stroke="#FF2D78" strokeWidth="1.5"/>
+              {/* Арка въезда */}
+              <path d="M238,545 L238,480 Q268,455 298,480 L298,545" fill="#9B30FF" fillOpacity="0.12" stroke="#9B30FF" strokeWidth="1.5" strokeOpacity="0.6"/>
 
-              {/* Малые купола */}
-              {[808, 830, 892, 916].map((x, i) => (
-                <g key={i}>
-                  <ellipse cx={x} cy={350 - i % 2 * 10} rx="8" ry="10" fill="#00E5FF" fillOpacity="0.06" stroke="#00E5FF" strokeWidth="0.8"/>
-                </g>
-              ))}
-            </g>
-
-            {/* ===== ЗДАНИЯ СПРАВА (бизнес/жилые) ===== */}
-            {/* Высотка МГУ - далеко справа */}
-            <g stroke="#9B30FF" strokeWidth="1" fill="none" opacity="0.7">
-              <rect x="1050" y="260" width="60" height="180" fill="#9B30FF" fillOpacity="0.05"/>
-              <rect x="1065" y="220" width="30" height="44" fill="#9B30FF" fillOpacity="0.06"/>
-              <rect x="1073" y="192" width="14" height="32" fill="#9B30FF" fillOpacity="0.07"/>
-              <line x1="1080" y1="192" x2="1080" y2="162"/>
-              <polygon points="1080,156 1084,166 1088,166 1084,170 1086,178 1080,174 1074,178 1076,170 1072,166 1076,166" fill="#9B30FF" fillOpacity="0.4" stroke="#9B30FF" strokeWidth="0.8"/>
-              {/* Крылья */}
-              <rect x="1020" y="300" width="30" height="140" fill="#9B30FF" fillOpacity="0.04"/>
-              <rect x="1110" y="300" width="30" height="140" fill="#9B30FF" fillOpacity="0.04"/>
-              {/* Окна */}
-              {[0,1,2,3,4].map(r => [0,1,2].map(c => (
-                <rect key={`${r}-${c}`} x={1056 + c * 18} y={272 + r * 30} width="8" height="14" fill="#9B30FF" fillOpacity="0.15" stroke="#9B30FF" strokeWidth="0.5"/>
+              {/* Декор башни — окна */}
+              {[0,1].map(r => [0,1,2].map(c => (
+                <rect key={`sw${r}-${c}`} x={228+c*28} y={385+r*50} width="16" height="22" rx="2"
+                  fill="#9B30FF" fillOpacity="0.12" stroke="#9B30FF" strokeWidth="1" strokeOpacity="0.45"/>
               )))}
             </g>
 
-            {/* Современные здания справа */}
-            <g stroke="#FF2D78" strokeWidth="1" fill="none" opacity="0.6">
-              <rect x="960" y="340" width="44" height="100" fill="#FF2D78" fillOpacity="0.04"/>
-              <polygon points="960,340 982,310 1004,340" fill="#FF2D78" fillOpacity="0.07"/>
-              {[0,1,2].map(r => [0,1].map(c => (
-                <rect key={`${r}-${c}`} x={966 + c * 18} y={350 + r * 28} width="10" height="16" fill="#FF2D78" fillOpacity="0.12" stroke="#FF2D78" strokeWidth="0.5"/>
+            {/* ======= КОТЕЛЬНИЧЕСКАЯ ВЫСОТКА — слева ======= */}
+            <g filter="url(#svgGlow)" opacity="0.75">
+              {/* Крылья */}
+              <rect x="20" y="380" width="55" height="320" fill="#00E5FF" fillOpacity="0.04" stroke="#00E5FF" strokeWidth="1" strokeOpacity="0.35"/>
+              <rect x="130" y="380" width="55" height="320" fill="#00E5FF" fillOpacity="0.04" stroke="#00E5FF" strokeWidth="1" strokeOpacity="0.35"/>
+              {/* Основное тело */}
+              <rect x="55" y="250" width="85" height="450" fill="#00E5FF" fillOpacity="0.05" stroke="#00E5FF" strokeWidth="1.5" strokeOpacity="0.5"/>
+              {/* Ступени */}
+              <rect x="68" y="200" width="59" height="55" fill="#00E5FF" fillOpacity="0.06" stroke="#00E5FF" strokeWidth="1.5" strokeOpacity="0.5"/>
+              <rect x="78" y="162" width="39" height="42" fill="#00E5FF" fillOpacity="0.07" stroke="#00E5FF" strokeWidth="1.5" strokeOpacity="0.5"/>
+              <rect x="87" y="130" width="21" height="36" fill="#00E5FF" fillOpacity="0.08" stroke="#00E5FF" strokeWidth="1.5" strokeOpacity="0.6"/>
+              {/* Шпиль */}
+              <line x1="97" y1="130" x2="97" y2="82" stroke="#00E5FF" strokeWidth="2" strokeOpacity="0.8"/>
+              <polygon points="97,74 103,88 111,88 105,96 108,106 97,100 86,106 89,96 83,88 91,88"
+                fill="#00E5FF" fillOpacity="0.5" stroke="#00E5FF" strokeWidth="1.2"/>
+              {/* Окна */}
+              {[0,1,2,3].map(r => [0,1,2].map(c => (
+                <rect key={`kw${r}-${c}`} x={62+c*24} y={262+r*48} width="14" height="20" rx="1"
+                  fill="#00E5FF" fillOpacity="0.1" stroke="#00E5FF" strokeWidth="0.8" strokeOpacity="0.4"/>
               )))}
             </g>
 
-            {/* ===== ЗДАНИЯ СЛЕВА ===== */}
-            {/* Высотка Котельническая */}
-            <g stroke="#00E5FF" strokeWidth="1" fill="none" opacity="0.65">
-              <rect x="340" y="270" width="56" height="170" fill="#00E5FF" fillOpacity="0.04"/>
-              <rect x="354" y="238" width="28" height="36" fill="#00E5FF" fillOpacity="0.05"/>
-              <rect x="361" y="212" width="14" height="30" fill="#00E5FF" fillOpacity="0.06"/>
-              <line x1="368" y1="212" x2="368" y2="178"/>
-              <polygon points="368,172 372,182 378,182 373,187 375,196 368,191 361,196 363,187 358,182 364,182" fill="#00E5FF" fillOpacity="0.4" stroke="#00E5FF" strokeWidth="0.8"/>
+            {/* ======= МГУ ВЫСОТКА — правый край ======= */}
+            <g filter="url(#svgGlow)" opacity="0.65">
+              <rect x="840" y="320" width="130" height="380" fill="#9B30FF" fillOpacity="0.04" stroke="#9B30FF" strokeWidth="1" strokeOpacity="0.35"/>
               {/* Крылья */}
-              <rect x="310" y="310" width="30" height="130" fill="#00E5FF" fillOpacity="0.03"/>
-              <rect x="396" y="310" width="30" height="130" fill="#00E5FF" fillOpacity="0.03"/>
-            </g>
-
-            {/* Обычные здания слева */}
-            <g stroke="#9B30FF" strokeWidth="0.8" fill="none" opacity="0.5">
-              <rect x="160" y="360" width="50" height="80" fill="#9B30FF" fillOpacity="0.04"/>
-              <rect x="215" y="340" width="40" height="100" fill="#9B30FF" fillOpacity="0.04"/>
-              <rect x="260" y="350" width="35" height="90" fill="#9B30FF" fillOpacity="0.04"/>
+              <rect x="780" y="400" width="60" height="300" fill="#9B30FF" fillOpacity="0.03" stroke="#9B30FF" strokeWidth="1" strokeOpacity="0.3"/>
+              <rect x="970" y="400" width="60" height="300" fill="#9B30FF" fillOpacity="0.03" stroke="#9B30FF" strokeWidth="1" strokeOpacity="0.3"/>
+              <rect x="858" y="260" width="94" height="64" fill="#9B30FF" fillOpacity="0.05" stroke="#9B30FF" strokeWidth="1.2" strokeOpacity="0.4"/>
+              <rect x="874" y="220" width="62" height="44" fill="#9B30FF" fillOpacity="0.06" stroke="#9B30FF" strokeWidth="1.2" strokeOpacity="0.45"/>
+              <rect x="888" y="185" width="34" height="38" fill="#9B30FF" fillOpacity="0.07" stroke="#9B30FF" strokeWidth="1.2" strokeOpacity="0.5"/>
+              <line x1="905" y1="185" x2="905" y2="140" stroke="#9B30FF" strokeWidth="2" strokeOpacity="0.7"/>
+              <polygon points="905,133 910,147 918,147 912,153 914,163 905,157 896,163 898,153 892,147 900,147"
+                fill="#9B30FF" fillOpacity="0.45" stroke="#9B30FF" strokeWidth="1"/>
               {/* Окна */}
-              {[160, 215, 260].map((bx, bi) => [0,1].map(r => [0,1].map(c => (
-                <rect key={`l${bi}-${r}-${c}`} x={bx+8+c*16} y={370+r*24} width="8" height="12" fill="#9B30FF" fillOpacity="0.12" stroke="#9B30FF" strokeWidth="0.4"/>
-              ))))}
+              {[0,1,2,3,4].map(r => [0,1,2,3].map(c => (
+                <rect key={`mw${r}-${c}`} x={848+c*24} y={332+r*44} width="14" height="20" rx="1"
+                  fill="#9B30FF" fillOpacity="0.12" stroke="#9B30FF" strokeWidth="0.8" strokeOpacity="0.4"/>
+              )))}
             </g>
 
-            {/* ===== ОТРАЖЕНИЕ / ГОРИЗОНТАЛЬНАЯ ЛИНИЯ ===== */}
-            <line x1="0" y1="440" x2="1440" y2="440" stroke="#9B30FF" strokeWidth="0.5" strokeOpacity="0.4"/>
-            <rect x="0" y="440" width="1440" height="80" fill="url(#neonViolet)" fillOpacity="0.05"/>
+            {/* ======= ГОРИЗОНТ И ОТРАЖЕНИЕ ======= */}
+            <line x1="0" y1="600" x2="1000" y2="600" stroke="#9B30FF" strokeWidth="1" strokeOpacity="0.3"/>
+            <rect x="0" y="600" width="1000" height="100" fill="#9B30FF" fillOpacity="0.04"/>
 
-            {/* ===== НЕОНОВЫЕ КОНТУРЫ (свечение поверх) ===== */}
-            {/* Спасская башня — яркий контур */}
-            <rect x="680" y="300" width="48" height="140" stroke="#9B30FF" strokeWidth="1" fill="none" strokeOpacity="0.6"/>
-            <circle cx="704" cy="280" r="8" stroke="#FFD700" strokeWidth="0.8" fill="none" strokeOpacity="0.8"/>
-            {/* Покровский — яркий контур */}
-            <ellipse cx="868" cy="295" rx="22" ry="30" stroke="#00E5FF" strokeWidth="1" fill="none" strokeOpacity="0.7"/>
-            <ellipse cx="832" cy="328" rx="14" ry="18" stroke="#00E5FF" strokeWidth="0.8" fill="none" strokeOpacity="0.6"/>
-            <ellipse cx="904" cy="328" rx="14" ry="18" stroke="#00E5FF" strokeWidth="0.8" fill="none" strokeOpacity="0.6"/>
+            {/* Fade из фона снизу */}
+            <rect x="0" y="0" width="1000" height="700" fill="url(#skyFade)"/>
           </svg>
 
-          {/* Радиальное свечение под силуэтом */}
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-40 pointer-events-none"
-            style={{ background: "radial-gradient(ellipse at center bottom, rgba(155,48,255,0.12) 0%, rgba(0,229,255,0.06) 50%, transparent 70%)" }} />
+          {/* Неоновое свечение под силуэтом */}
+          <div className="absolute bottom-0 right-0 w-[70%] h-60 pointer-events-none"
+            style={{ background: "radial-gradient(ellipse at 60% bottom, rgba(0,229,255,0.08) 0%, rgba(155,48,255,0.08) 40%, transparent 70%)" }} />
         </div>
 
+        {/* Тёмный оверлей слева — чтобы текст читался */}
+        <div className="absolute inset-0 pointer-events-none"
+          style={{ background: "linear-gradient(to right, rgba(6,5,26,0.92) 0%, rgba(6,5,26,0.75) 45%, rgba(6,5,26,0.15) 75%, transparent 100%)" }} />
+
         {/* Ambient glows */}
-        <div className="absolute top-1/4 left-1/3 w-[500px] h-[500px] bg-[#9B30FF]/6 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#FF2D78]/6 rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute top-1/2 left-0 w-64 h-64 bg-[#00E5FF]/5 rounded-full blur-[80px] pointer-events-none" />
+        <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-[#9B30FF]/6 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute bottom-1/3 left-1/3 w-72 h-72 bg-[#00E5FF]/5 rounded-full blur-[80px] pointer-events-none" />
 
         <div className="container mx-auto px-4 relative z-10 pb-12">
           <div className="flex items-center gap-16 xl:gap-20">
@@ -958,6 +1091,9 @@ export default function Index() {
             </div>
           </Reveal>
         </section>
+
+        {/* REVIEWS */}
+        <ReviewsSection />
 
         {/* ECOSYSTEM */}
         <Reveal>
