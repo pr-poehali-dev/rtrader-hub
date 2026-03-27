@@ -713,184 +713,26 @@ export default function Index() {
 
       {/* HERO */}
       <section id="hero" className="relative min-h-screen flex flex-col justify-center overflow-hidden pt-24">
-        {/* Moscow skyline — большой, смещён вправо, не мешает тексту */}
+        {/* Moscow skyline — AI-generated neon retrowav image */}
         <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          <svg
-            viewBox="0 0 1000 700"
-            preserveAspectRatio="xMaxYMax meet"
-            className="absolute bottom-0 right-0 h-[85%] w-auto"
-            style={{ opacity: 0.28 }}
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <defs>
-              <filter id="svgGlow" x="-30%" y="-30%" width="160%" height="160%">
-                <feGaussianBlur stdDeviation="3.5" result="blur" />
-                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-              </filter>
-              <filter id="svgGlowStrong" x="-40%" y="-40%" width="180%" height="180%">
-                <feGaussianBlur stdDeviation="6" result="blur" />
-                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-              </filter>
-              <linearGradient id="skyFade" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#06051a" stopOpacity="0"/>
-                <stop offset="85%" stopColor="#06051a" stopOpacity="0"/>
-                <stop offset="100%" stopColor="#06051a" stopOpacity="0.7"/>
-              </linearGradient>
-            </defs>
-
-            {/* ======= ПОКРОВСКИЙ СОБОР (Василий Блаженный) — главный акцент, центр ======= */}
-            <g filter="url(#svgGlowStrong)">
-              {/* Основание / платформа */}
-              <rect x="320" y="530" width="340" height="170" fill="#00E5FF" fillOpacity="0.06" stroke="#00E5FF" strokeWidth="1.5" strokeOpacity="0.5"/>
-
-              {/* Центральная высокая башня */}
-              <rect x="450" y="350" width="80" height="185" fill="#00E5FF" fillOpacity="0.08" stroke="#00E5FF" strokeWidth="2" strokeOpacity="0.8"/>
-              {/* Центральный луковичный купол — большой */}
-              <ellipse cx="490" cy="310" rx="50" ry="65" fill="#00E5FF" fillOpacity="0.1" stroke="#00E5FF" strokeWidth="2.5" strokeOpacity="0.9"/>
-              {/* Рёбра купола */}
-              <path d="M490,245 Q510,270 490,310 Q470,270 490,245" fill="none" stroke="#00E5FF" strokeWidth="1" strokeOpacity="0.5"/>
-              <path d="M490,245 Q518,280 500,318" fill="none" stroke="#00E5FF" strokeWidth="0.8" strokeOpacity="0.35"/>
-              <path d="M490,245 Q462,280 480,318" fill="none" stroke="#00E5FF" strokeWidth="0.8" strokeOpacity="0.35"/>
-              {/* Шпиль и крест */}
-              <line x1="490" y1="245" x2="490" y2="195" stroke="#00E5FF" strokeWidth="2" strokeOpacity="0.9"/>
-              {/* Православный крест */}
-              <line x1="480" y1="200" x2="500" y2="200" stroke="#FFD700" strokeWidth="3" strokeOpacity="1"/>
-              <line x1="490" y1="193" x2="490" y2="215" stroke="#FFD700" strokeWidth="3" strokeOpacity="1"/>
-              <line x1="482" y1="208" x2="498" y2="208" stroke="#FFD700" strokeWidth="2" strokeOpacity="0.8"/>
-              {/* Нижняя косая перекладина */}
-              <line x1="483" y1="213" x2="497" y2="207" stroke="#FFD700" strokeWidth="1.5" strokeOpacity="0.7"/>
-
-              {/* Башня 2 — левая крупная */}
-              <rect x="370" y="400" width="60" height="135" fill="#00E5FF" fillOpacity="0.07" stroke="#00E5FF" strokeWidth="1.8" strokeOpacity="0.7"/>
-              <ellipse cx="400" cy="378" rx="36" ry="46" fill="#00E5FF" fillOpacity="0.09" stroke="#00E5FF" strokeWidth="2" strokeOpacity="0.8"/>
-              <path d="M400,332 Q415,350 400,378 Q385,350 400,332" fill="none" stroke="#00E5FF" strokeWidth="1" strokeOpacity="0.45"/>
-              <line x1="400" y1="332" x2="400" y2="300" stroke="#00E5FF" strokeWidth="1.5"/>
-              <line x1="394" y1="305" x2="406" y2="305" stroke="#FFD700" strokeWidth="2.5" strokeOpacity="0.95"/>
-              <line x1="400" y1="298" x2="400" y2="312" stroke="#FFD700" strokeWidth="2.5" strokeOpacity="0.95"/>
-              <line x1="395" y1="309" x2="405" y2="309" stroke="#FFD700" strokeWidth="1.5" strokeOpacity="0.7"/>
-
-              {/* Башня 3 — правая крупная */}
-              <rect x="550" y="400" width="60" height="135" fill="#00E5FF" fillOpacity="0.07" stroke="#00E5FF" strokeWidth="1.8" strokeOpacity="0.7"/>
-              <ellipse cx="580" cy="378" rx="36" ry="46" fill="#00E5FF" fillOpacity="0.09" stroke="#00E5FF" strokeWidth="2" strokeOpacity="0.8"/>
-              <path d="M580,332 Q595,350 580,378 Q565,350 580,332" fill="none" stroke="#00E5FF" strokeWidth="1" strokeOpacity="0.45"/>
-              <line x1="580" y1="332" x2="580" y2="300" stroke="#00E5FF" strokeWidth="1.5"/>
-              <line x1="574" y1="305" x2="586" y2="305" stroke="#FFD700" strokeWidth="2.5" strokeOpacity="0.95"/>
-              <line x1="580" y1="298" x2="580" y2="312" stroke="#FFD700" strokeWidth="2.5" strokeOpacity="0.95"/>
-              <line x1="575" y1="309" x2="585" y2="309" stroke="#FFD700" strokeWidth="1.5" strokeOpacity="0.7"/>
-
-              {/* Башня 4 — маленькая левая */}
-              <rect x="328" y="460" width="38" height="75" fill="#00E5FF" fillOpacity="0.06" stroke="#00E5FF" strokeWidth="1.5" strokeOpacity="0.6"/>
-              <ellipse cx="347" cy="447" rx="22" ry="28" fill="#00E5FF" fillOpacity="0.07" stroke="#00E5FF" strokeWidth="1.5" strokeOpacity="0.65"/>
-              <line x1="347" y1="419" x2="347" y2="395" stroke="#00E5FF" strokeWidth="1.2"/>
-              <line x1="342" y1="399" x2="352" y2="399" stroke="#FFD700" strokeWidth="2" strokeOpacity="0.9"/>
-              <line x1="347" y1="394" x2="347" y2="404" stroke="#FFD700" strokeWidth="2" strokeOpacity="0.9"/>
-
-              {/* Башня 5 — маленькая правая */}
-              <rect x="614" y="460" width="38" height="75" fill="#00E5FF" fillOpacity="0.06" stroke="#00E5FF" strokeWidth="1.5" strokeOpacity="0.6"/>
-              <ellipse cx="633" cy="447" rx="22" ry="28" fill="#00E5FF" fillOpacity="0.07" stroke="#00E5FF" strokeWidth="1.5" strokeOpacity="0.65"/>
-              <line x1="633" y1="419" x2="633" y2="395" stroke="#00E5FF" strokeWidth="1.2"/>
-              <line x1="628" y1="399" x2="638" y2="399" stroke="#FFD700" strokeWidth="2" strokeOpacity="0.9"/>
-              <line x1="633" y1="394" x2="633" y2="404" stroke="#FFD700" strokeWidth="2" strokeOpacity="0.9"/>
-
-              {/* Декоративные арки основания */}
-              <path d="M340,530 Q380,510 420,530" fill="none" stroke="#00E5FF" strokeWidth="1.5" strokeOpacity="0.5"/>
-              <path d="M440,530 Q490,505 540,530" fill="none" stroke="#00E5FF" strokeWidth="1.5" strokeOpacity="0.5"/>
-              <path d="M560,530 Q600,510 640,530" fill="none" stroke="#00E5FF" strokeWidth="1.5" strokeOpacity="0.5"/>
-            </g>
-
-            {/* ======= СПАССКАЯ БАШНЯ — левее Покровского ======= */}
-            <g filter="url(#svgGlow)">
-              {/* Стена кремля */}
-              <rect x="150" y="540" width="220" height="160" fill="#9B30FF" fillOpacity="0.05" stroke="#9B30FF" strokeWidth="1.5" strokeOpacity="0.4"/>
-              {/* Зубцы стены */}
-              {[150,166,182,198,214,230,246,262,278,294,310,326,342,358].map((x) => (
-                <rect key={x} x={x} y={526} width="10" height="16" fill="#9B30FF" fillOpacity="0.15" stroke="#9B30FF" strokeWidth="1" strokeOpacity="0.5"/>
-              ))}
-
-              {/* Тело башни — 3 яруса */}
-              <rect x="218" y="370" width="100" height="175" fill="#9B30FF" fillOpacity="0.1" stroke="#9B30FF" strokeWidth="2.5" strokeOpacity="0.85"/>
-              <rect x="228" y="320" width="80" height="55" fill="#9B30FF" fillOpacity="0.1" stroke="#9B30FF" strokeWidth="2" strokeOpacity="0.75"/>
-              <rect x="238" y="280" width="60" height="44" fill="#9B30FF" fillOpacity="0.1" stroke="#9B30FF" strokeWidth="2" strokeOpacity="0.7"/>
-              <rect x="248" y="248" width="40" height="36" fill="#9B30FF" fillOpacity="0.12" stroke="#9B30FF" strokeWidth="2" strokeOpacity="0.8"/>
-
-              {/* Часы — крупнее */}
-              <circle cx="268" cy="340" r="20" stroke="#FFD700" strokeWidth="2.5" fill="#9B30FF" fillOpacity="0.15" strokeOpacity="0.95"/>
-              <circle cx="268" cy="340" r="16" stroke="#FFD700" strokeWidth="1" fill="none" strokeOpacity="0.4"/>
-              <line x1="268" y1="326" x2="268" y2="340" stroke="#FFD700" strokeWidth="2" strokeOpacity="0.9"/>
-              <line x1="268" y1="340" x2="276" y2="348" stroke="#FFD700" strokeWidth="2" strokeOpacity="0.9"/>
-
-              {/* Шпиль */}
-              <line x1="268" y1="248" x2="268" y2="185" stroke="#9B30FF" strokeWidth="2.5" strokeOpacity="0.9"/>
-              {/* Рубиновая звезда */}
-              <polygon points="268,172 274,188 290,188 278,198 282,214 268,204 254,214 258,198 246,188 262,188"
-                fill="#FF2D78" fillOpacity="0.85" stroke="#FF2D78" strokeWidth="1.5"/>
-              {/* Арка въезда */}
-              <path d="M238,545 L238,480 Q268,455 298,480 L298,545" fill="#9B30FF" fillOpacity="0.12" stroke="#9B30FF" strokeWidth="1.5" strokeOpacity="0.6"/>
-
-              {/* Декор башни — окна */}
-              {[0,1].map(r => [0,1,2].map(c => (
-                <rect key={`sw${r}-${c}`} x={228+c*28} y={385+r*50} width="16" height="22" rx="2"
-                  fill="#9B30FF" fillOpacity="0.12" stroke="#9B30FF" strokeWidth="1" strokeOpacity="0.45"/>
-              )))}
-            </g>
-
-            {/* ======= КОТЕЛЬНИЧЕСКАЯ ВЫСОТКА — слева ======= */}
-            <g filter="url(#svgGlow)" opacity="0.75">
-              {/* Крылья */}
-              <rect x="20" y="380" width="55" height="320" fill="#00E5FF" fillOpacity="0.04" stroke="#00E5FF" strokeWidth="1" strokeOpacity="0.35"/>
-              <rect x="130" y="380" width="55" height="320" fill="#00E5FF" fillOpacity="0.04" stroke="#00E5FF" strokeWidth="1" strokeOpacity="0.35"/>
-              {/* Основное тело */}
-              <rect x="55" y="250" width="85" height="450" fill="#00E5FF" fillOpacity="0.05" stroke="#00E5FF" strokeWidth="1.5" strokeOpacity="0.5"/>
-              {/* Ступени */}
-              <rect x="68" y="200" width="59" height="55" fill="#00E5FF" fillOpacity="0.06" stroke="#00E5FF" strokeWidth="1.5" strokeOpacity="0.5"/>
-              <rect x="78" y="162" width="39" height="42" fill="#00E5FF" fillOpacity="0.07" stroke="#00E5FF" strokeWidth="1.5" strokeOpacity="0.5"/>
-              <rect x="87" y="130" width="21" height="36" fill="#00E5FF" fillOpacity="0.08" stroke="#00E5FF" strokeWidth="1.5" strokeOpacity="0.6"/>
-              {/* Шпиль */}
-              <line x1="97" y1="130" x2="97" y2="82" stroke="#00E5FF" strokeWidth="2" strokeOpacity="0.8"/>
-              <polygon points="97,74 103,88 111,88 105,96 108,106 97,100 86,106 89,96 83,88 91,88"
-                fill="#00E5FF" fillOpacity="0.5" stroke="#00E5FF" strokeWidth="1.2"/>
-              {/* Окна */}
-              {[0,1,2,3].map(r => [0,1,2].map(c => (
-                <rect key={`kw${r}-${c}`} x={62+c*24} y={262+r*48} width="14" height="20" rx="1"
-                  fill="#00E5FF" fillOpacity="0.1" stroke="#00E5FF" strokeWidth="0.8" strokeOpacity="0.4"/>
-              )))}
-            </g>
-
-            {/* ======= МГУ ВЫСОТКА — правый край ======= */}
-            <g filter="url(#svgGlow)" opacity="0.65">
-              <rect x="840" y="320" width="130" height="380" fill="#9B30FF" fillOpacity="0.04" stroke="#9B30FF" strokeWidth="1" strokeOpacity="0.35"/>
-              {/* Крылья */}
-              <rect x="780" y="400" width="60" height="300" fill="#9B30FF" fillOpacity="0.03" stroke="#9B30FF" strokeWidth="1" strokeOpacity="0.3"/>
-              <rect x="970" y="400" width="60" height="300" fill="#9B30FF" fillOpacity="0.03" stroke="#9B30FF" strokeWidth="1" strokeOpacity="0.3"/>
-              <rect x="858" y="260" width="94" height="64" fill="#9B30FF" fillOpacity="0.05" stroke="#9B30FF" strokeWidth="1.2" strokeOpacity="0.4"/>
-              <rect x="874" y="220" width="62" height="44" fill="#9B30FF" fillOpacity="0.06" stroke="#9B30FF" strokeWidth="1.2" strokeOpacity="0.45"/>
-              <rect x="888" y="185" width="34" height="38" fill="#9B30FF" fillOpacity="0.07" stroke="#9B30FF" strokeWidth="1.2" strokeOpacity="0.5"/>
-              <line x1="905" y1="185" x2="905" y2="140" stroke="#9B30FF" strokeWidth="2" strokeOpacity="0.7"/>
-              <polygon points="905,133 910,147 918,147 912,153 914,163 905,157 896,163 898,153 892,147 900,147"
-                fill="#9B30FF" fillOpacity="0.45" stroke="#9B30FF" strokeWidth="1"/>
-              {/* Окна */}
-              {[0,1,2,3,4].map(r => [0,1,2,3].map(c => (
-                <rect key={`mw${r}-${c}`} x={848+c*24} y={332+r*44} width="14" height="20" rx="1"
-                  fill="#9B30FF" fillOpacity="0.12" stroke="#9B30FF" strokeWidth="0.8" strokeOpacity="0.4"/>
-              )))}
-            </g>
-
-            {/* ======= ГОРИЗОНТ И ОТРАЖЕНИЕ ======= */}
-            <line x1="0" y1="600" x2="1000" y2="600" stroke="#9B30FF" strokeWidth="1" strokeOpacity="0.3"/>
-            <rect x="0" y="600" width="1000" height="100" fill="#9B30FF" fillOpacity="0.04"/>
-
-            {/* Fade из фона снизу */}
-            <rect x="0" y="0" width="1000" height="700" fill="url(#skyFade)"/>
-          </svg>
-
-          {/* Неоновое свечение под силуэтом */}
-          <div className="absolute bottom-0 right-0 w-[70%] h-60 pointer-events-none"
-            style={{ background: "radial-gradient(ellipse at 60% bottom, rgba(0,229,255,0.08) 0%, rgba(155,48,255,0.08) 40%, transparent 70%)" }} />
+          {/* Само изображение — правая половина, снизу */}
+          <img
+            src="https://cdn.poehali.dev/projects/39a4ac3c-06be-41f0-97f1-cc3959260964/files/4b1069f6-e9ad-462d-9ecb-0fa02243b605.jpg"
+            alt=""
+            className="absolute bottom-0 right-0 h-[78%] w-auto object-contain object-right-bottom select-none"
+            style={{ opacity: 0.55, mixBlendMode: "screen" }}
+          />
+          {/* Маска: затухание снизу */}
+          <div className="absolute inset-0"
+            style={{ background: "linear-gradient(to top, rgba(6,5,26,0.85) 0%, rgba(6,5,26,0.3) 25%, transparent 55%)" }} />
+          {/* Неоновое свечение под изображением */}
+          <div className="absolute bottom-0 right-0 w-[65%] h-48 pointer-events-none"
+            style={{ background: "radial-gradient(ellipse at 65% bottom, rgba(0,229,255,0.1) 0%, rgba(155,48,255,0.1) 50%, transparent 75%)" }} />
         </div>
 
-        {/* Тёмный оверлей слева — чтобы текст читался */}
+        {/* Тёмный оверлей слева — текст читается поверх города */}
         <div className="absolute inset-0 pointer-events-none"
-          style={{ background: "linear-gradient(to right, rgba(6,5,26,0.92) 0%, rgba(6,5,26,0.75) 45%, rgba(6,5,26,0.15) 75%, transparent 100%)" }} />
+          style={{ background: "linear-gradient(to right, rgba(6,5,26,0.95) 0%, rgba(6,5,26,0.82) 38%, rgba(6,5,26,0.4) 60%, rgba(6,5,26,0.05) 80%, transparent 100%)" }} />
 
         {/* Ambient glows */}
         <div className="absolute top-1/4 left-1/4 w-[400px] h-[400px] bg-[#9B30FF]/6 rounded-full blur-[100px] pointer-events-none" />
