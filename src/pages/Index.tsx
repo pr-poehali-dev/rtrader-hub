@@ -513,11 +513,6 @@ function SectionCarousel() {
     pauseTemporary();
     scrollToIdx(activeRef.current - 1);
   };
-  const next = () => {
-    triggerUserAction();
-    scrollTo(Math.min(SECTIONS.length - 1, active + 1));
-  };
-
   const onMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     isDragging.current = true;
     startX.current = e.pageX;
