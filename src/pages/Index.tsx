@@ -303,10 +303,15 @@ function MiniDashboard() {
 
 function SectionCarousel() {
   const [active, setActive] = useState(1);
+  const [hoveredCard, setHoveredCard] = useState<number | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const isDragging = useRef(false);
   const startX = useRef(0);
   const scrollStart = useRef(0);
+  const autoplayRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const autoplayActive = useRef(false);
+  const userActionCooldown = useRef<ReturnType<typeof setTimeout> | null>(null);
   const cardW = 280;
   const gap = 16;
 
@@ -318,19 +323,89 @@ function SectionCarousel() {
     container.scrollTo({ left: Math.max(0, offset), behavior: "smooth" });
   }, []);
 
-  const prev = () => scrollTo(Math.max(0, active - 1));
-  const next = () => scrollTo(Math.min(SECTIONS.length - 1, active + 1));
+  const stopAutoplay = useCallback(() => {
+    if (autoplayRef.current) {
+      clearInterval(autoplayRef.current);
+      autoplayRef.current = null;
+    }
+  }, []);
+
+  const startAutoplay = useCallback(() => {
+    if (autoplayRef.current) return;
+    autoplayRef.current = setInterval(() => {
+      setActive(prev => {
+        const next = (prev + 1) % SECTIONS.length;
+        const container = containerRef.current;
+        if (container) {
+          const offset = next * (cardW + gap) - container.clientWidth / 2 + cardW / 2;
+          container.scrollTo({ left: Math.max(0, offset), behavior: "smooth" });
+        }
+        return next;
+      });
+    }, 3500);
+  }, []);
+
+  const onWrapperEnter = () => {
+    autoplayActive.current = true;
+    if (hoveredCard === null && !isDragging.current) startAutoplay();
+  };
+
+  const onWrapperLeave = () => {
+    autoplayActive.current = false;
+    stopAutoplay();
+  };
+
+  const onCardEnter = (i: number) => {
+    setHoveredCard(i);
+    stopAutoplay();
+  };
+
+  const onCardLeave = () => {
+    setHoveredCard(null);
+    if (autoplayActive.current && !isDragging.current) startAutoplay();
+  };
+
+  const triggerUserAction = () => {
+    stopAutoplay();
+    if (userActionCooldown.current) clearTimeout(userActionCooldown.current);
+    userActionCooldown.current = setTimeout(() => {
+      if (autoplayActive.current) startAutoplay();
+    }, 2000);
+  };
+
+  const prev = () => {
+    triggerUserAction();
+    scrollTo(Math.max(0, active - 1));
+  };
+  const next = () => {
+    triggerUserAction();
+    scrollTo(Math.min(SECTIONS.length - 1, active + 1));
+  };
 
   const onMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
     isDragging.current = true;
     startX.current = e.pageX;
-    scrollStart.current = (e.currentTarget).scrollLeft;
+    scrollStart.current = e.currentTarget.scrollLeft;
+    stopAutoplay();
   };
   const onMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!isDragging.current) return;
     e.currentTarget.scrollLeft = scrollStart.current - (e.pageX - startX.current);
   };
-  const onMouseUp = () => { isDragging.current = false; };
+  const onMouseUp = () => {
+    isDragging.current = false;
+    if (userActionCooldown.current) clearTimeout(userActionCooldown.current);
+    userActionCooldown.current = setTimeout(() => {
+      if (autoplayActive.current && hoveredCard === null) startAutoplay();
+    }, 2000);
+  };
+
+  useEffect(() => {
+    return () => {
+      stopAutoplay();
+      if (userActionCooldown.current) clearTimeout(userActionCooldown.current);
+    };
+  }, [stopAutoplay]);
 
   const navigateTo = (section: (typeof SECTIONS)[0]) => {
     if (section.isVip) {
@@ -342,7 +417,7 @@ function SectionCarousel() {
   };
 
   return (
-    <div className="relative">
+    <div ref={wrapperRef} className="relative" onMouseEnter={onWrapperEnter} onMouseLeave={onWrapperLeave}>
       <div
         ref={containerRef}
         className="overflow-x-auto scrollbar-hide pb-4 cursor-grab active:cursor-grabbing"
@@ -355,19 +430,24 @@ function SectionCarousel() {
         <div className="flex gap-4 px-4 md:px-0" style={{ width: "max-content" }}>
           {SECTIONS.map((s, i) => {
             const isActive = i === active;
+            const isHovered = i === hoveredCard;
             return (
               <div
                 key={s.id}
-                onClick={() => setActive(i)}
+                onClick={() => { triggerUserAction(); setActive(i); }}
+                onMouseEnter={() => onCardEnter(i)}
+                onMouseLeave={onCardLeave}
                 className="carousel-card flex-shrink-0 flex flex-col gap-4 p-6 cursor-pointer select-none"
                 style={{
                   width: cardW,
-                  transform: isActive
-                    ? "scale(1.05) perspective(800px) rotateY(-3deg)"
-                    : "scale(1) perspective(800px) rotateY(0deg)",
+                  transform: isHovered
+                    ? "scale(1.06) perspective(800px) rotateY(-4deg) translateY(-4px)"
+                    : isActive
+                      ? "scale(1.04) perspective(800px) rotateY(-3deg)"
+                      : "scale(1) perspective(800px) rotateY(0deg)",
                   transition: "transform 0.35s cubic-bezier(0.4,0,0.2,1), box-shadow 0.35s ease, border-color 0.35s ease",
-                  borderColor: isActive ? s.accent : "rgba(255,255,255,0.08)",
-                  boxShadow: isActive
+                  borderColor: isActive || isHovered ? s.accent : "rgba(255,255,255,0.08)",
+                  boxShadow: isActive || isHovered
                     ? `0 0 30px ${s.glow}, 0 8px 40px rgba(0,0,0,0.4)`
                     : "0 4px 20px rgba(0,0,0,0.3)",
                 }}
@@ -402,7 +482,7 @@ function SectionCarousel() {
         </button>
         <div className="flex gap-2 items-center">
           {SECTIONS.map((_, i) => (
-            <button key={i} onClick={() => scrollTo(i)}
+            <button key={i} onClick={() => { triggerUserAction(); scrollTo(i); }}
               className="rounded-full transition-all duration-300"
               style={{
                 width: i === active ? 18 : 6,
@@ -492,9 +572,196 @@ export default function Index() {
 
       {/* HERO */}
       <section id="hero" className="relative min-h-screen flex flex-col justify-center overflow-hidden pt-24">
-        <div className="absolute top-1/4 left-1/3 w-[500px] h-[500px] bg-[#9B30FF]/8 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#FF2D78]/8 rounded-full blur-[100px] pointer-events-none" />
-        <div className="absolute top-1/2 left-0 w-64 h-64 bg-[#00E5FF]/6 rounded-full blur-[80px] pointer-events-none" />
+        {/* Moscow skyline SVG background */}
+        <div className="absolute inset-0 flex items-end justify-center pointer-events-none overflow-hidden">
+          <svg
+            viewBox="0 0 1440 520"
+            preserveAspectRatio="xMidYMax slice"
+            className="w-full absolute bottom-0"
+            style={{ opacity: 0.18, filter: "blur(0.5px)" }}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <defs>
+              <linearGradient id="neonViolet" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#9B30FF" stopOpacity="1" />
+                <stop offset="100%" stopColor="#9B30FF" stopOpacity="0.2" />
+              </linearGradient>
+              <linearGradient id="neonCyan" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#00E5FF" stopOpacity="1" />
+                <stop offset="100%" stopColor="#00E5FF" stopOpacity="0.2" />
+              </linearGradient>
+              <linearGradient id="neonPink" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#FF2D78" stopOpacity="1" />
+                <stop offset="100%" stopColor="#FF2D78" stopOpacity="0.2" />
+              </linearGradient>
+              <filter id="glow">
+                <feGaussianBlur stdDeviation="2" result="blur" />
+                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
+
+            {/* ===== КРЕМЛЬ - центр ===== */}
+            {/* Главная Спасская башня */}
+            <g filter="url(#glow)" stroke="#9B30FF" strokeWidth="1.5" fill="none">
+              {/* Тело башни */}
+              <rect x="680" y="300" width="48" height="140" stroke="#9B30FF" fill="#9B30FF" fillOpacity="0.08"/>
+              {/* Ярус 2 */}
+              <rect x="688" y="268" width="32" height="36" fill="#9B30FF" fillOpacity="0.1"/>
+              {/* Ярус 3 */}
+              <rect x="694" y="242" width="20" height="30" fill="#9B30FF" fillOpacity="0.1"/>
+              {/* Звёздный шпиль */}
+              <line x1="704" y1="242" x2="704" y2="195"/>
+              <polygon points="704,188 708,202 720,202 710,210 714,224 704,216 694,224 698,210 688,202 700,202" fill="#FF2D78" fillOpacity="0.7" stroke="#FF2D78"/>
+              {/* Часы */}
+              <circle cx="704" cy="280" r="8" stroke="#FFD700" strokeWidth="1" fill="none"/>
+              <line x1="704" y1="276" x2="704" y2="280" stroke="#FFD700"/>
+              <line x1="704" y1="280" x2="707" y2="283" stroke="#FFD700"/>
+              {/* Арка */}
+              <path d="M688,440 L688,380 Q704,360 720,380 L720,440" fill="#9B30FF" fillOpacity="0.15"/>
+            </g>
+
+            {/* Никольская башня - левее */}
+            <g filter="url(#glow)" stroke="#9B30FF" strokeWidth="1.2" fill="none">
+              <rect x="620" y="320" width="38" height="120" fill="#9B30FF" fillOpacity="0.07"/>
+              <rect x="626" y="295" width="26" height="30" fill="#9B30FF" fillOpacity="0.09"/>
+              <rect x="631" y="272" width="16" height="26" fill="#9B30FF" fillOpacity="0.1"/>
+              {/* Готический шпиль */}
+              <polygon points="639,272 645,285 651,272 651,265 645,255 639,265" fill="#9B30FF" fillOpacity="0.2"/>
+              <line x1="645" y1="255" x2="645" y2="215"/>
+              <polygon points="645,208 650,220 656,220 651,226 653,234 645,229 637,234 639,226 634,220 640,220" fill="#FF2D78" fillOpacity="0.6" stroke="#FF2D78" strokeWidth="0.8"/>
+            </g>
+
+            {/* Боровицкая башня */}
+            <g stroke="#9B30FF" strokeWidth="1" fill="none">
+              <rect x="748" y="330" width="34" height="110" fill="#9B30FF" fillOpacity="0.06"/>
+              <rect x="753" y="308" width="24" height="26" fill="#9B30FF" fillOpacity="0.08"/>
+              <line x1="765" y1="308" x2="765" y2="268"/>
+              <polygon points="765,262 770,275 776,275 771,281 773,289 765,284 757,289 759,281 754,275 760,275" fill="#FF2D78" fillOpacity="0.55" stroke="#FF2D78" strokeWidth="0.8"/>
+            </g>
+
+            {/* Кремлёвская стена */}
+            <g stroke="#9B30FF" strokeWidth="1.5" fill="none">
+              <path d="M580,440 L580,390 L620,390 L620,440" fill="#9B30FF" fillOpacity="0.05"/>
+              {/* Зубцы */}
+              {[580,590,600,610].map(x => (
+                <rect key={x} x={x} y={382} width="6" height="10" fill="#9B30FF" fillOpacity="0.2" stroke="#9B30FF"/>
+              ))}
+              <path d="M750,440 L750,390 L800,390 L800,440" fill="#9B30FF" fillOpacity="0.05"/>
+              {[750,760,770,780,790].map(x => (
+                <rect key={x} x={x} y={382} width="6" height="10" fill="#9B30FF" fillOpacity="0.2" stroke="#9B30FF"/>
+              ))}
+            </g>
+
+            {/* ===== ПОКРОВСКИЙ СОБОР (Василий Блаженный) - правее Кремля ===== */}
+            <g filter="url(#glow)" stroke="#00E5FF" strokeWidth="1.2" fill="none">
+              {/* Центральная башня */}
+              <rect x="850" y="310" width="36" height="130" fill="#00E5FF" fillOpacity="0.06"/>
+              {/* Луковичный купол центр */}
+              <ellipse cx="868" cy="295" rx="22" ry="30" fill="#00E5FF" fillOpacity="0.08" stroke="#00E5FF"/>
+              <path d="M846,295 Q868,258 890,295" fill="#00E5FF" fillOpacity="0.12"/>
+              <line x1="868" y1="265" x2="868" y2="238"/>
+              {/* Крест */}
+              <line x1="864" y1="238" x2="872" y2="238" stroke="#FFD700" strokeWidth="1.5"/>
+              <line x1="868" y1="234" x2="868" y2="242" stroke="#FFD700" strokeWidth="1.5"/>
+              <line x1="865" y1="240" x2="871" y2="240" stroke="#FFD700" strokeWidth="1"/>
+
+              {/* Боковая башня 1 */}
+              <rect x="820" y="340" width="24" height="100" fill="#00E5FF" fillOpacity="0.05"/>
+              <ellipse cx="832" cy="328" rx="14" ry="18" fill="#00E5FF" fillOpacity="0.07" stroke="#00E5FF" strokeWidth="1"/>
+              <path d="M818,328 Q832,308 846,328" fill="#00E5FF" fillOpacity="0.1"/>
+              <line x1="832" y1="310" x2="832" y2="290"/>
+              <line x1="829" y1="290" x2="835" y2="290" stroke="#FFD700"/>
+              <line x1="832" y1="287" x2="832" y2="293" stroke="#FFD700"/>
+
+              {/* Боковая башня 2 */}
+              <rect x="892" y="340" width="24" height="100" fill="#00E5FF" fillOpacity="0.05"/>
+              <ellipse cx="904" cy="328" rx="14" ry="18" fill="#00E5FF" fillOpacity="0.07" stroke="#00E5FF" strokeWidth="1"/>
+              <path d="M890,328 Q904,308 918,328" fill="#00E5FF" fillOpacity="0.1"/>
+              <line x1="904" y1="310" x2="904" y2="290"/>
+              <line x1="901" y1="290" x2="907" y2="290" stroke="#FFD700"/>
+              <line x1="904" y1="287" x2="904" y2="293" stroke="#FFD700"/>
+
+              {/* Малые купола */}
+              {[808, 830, 892, 916].map((x, i) => (
+                <g key={i}>
+                  <ellipse cx={x} cy={350 - i % 2 * 10} rx="8" ry="10" fill="#00E5FF" fillOpacity="0.06" stroke="#00E5FF" strokeWidth="0.8"/>
+                </g>
+              ))}
+            </g>
+
+            {/* ===== ЗДАНИЯ СПРАВА (бизнес/жилые) ===== */}
+            {/* Высотка МГУ - далеко справа */}
+            <g stroke="#9B30FF" strokeWidth="1" fill="none" opacity="0.7">
+              <rect x="1050" y="260" width="60" height="180" fill="#9B30FF" fillOpacity="0.05"/>
+              <rect x="1065" y="220" width="30" height="44" fill="#9B30FF" fillOpacity="0.06"/>
+              <rect x="1073" y="192" width="14" height="32" fill="#9B30FF" fillOpacity="0.07"/>
+              <line x1="1080" y1="192" x2="1080" y2="162"/>
+              <polygon points="1080,156 1084,166 1088,166 1084,170 1086,178 1080,174 1074,178 1076,170 1072,166 1076,166" fill="#9B30FF" fillOpacity="0.4" stroke="#9B30FF" strokeWidth="0.8"/>
+              {/* Крылья */}
+              <rect x="1020" y="300" width="30" height="140" fill="#9B30FF" fillOpacity="0.04"/>
+              <rect x="1110" y="300" width="30" height="140" fill="#9B30FF" fillOpacity="0.04"/>
+              {/* Окна */}
+              {[0,1,2,3,4].map(r => [0,1,2].map(c => (
+                <rect key={`${r}-${c}`} x={1056 + c * 18} y={272 + r * 30} width="8" height="14" fill="#9B30FF" fillOpacity="0.15" stroke="#9B30FF" strokeWidth="0.5"/>
+              )))}
+            </g>
+
+            {/* Современные здания справа */}
+            <g stroke="#FF2D78" strokeWidth="1" fill="none" opacity="0.6">
+              <rect x="960" y="340" width="44" height="100" fill="#FF2D78" fillOpacity="0.04"/>
+              <polygon points="960,340 982,310 1004,340" fill="#FF2D78" fillOpacity="0.07"/>
+              {[0,1,2].map(r => [0,1].map(c => (
+                <rect key={`${r}-${c}`} x={966 + c * 18} y={350 + r * 28} width="10" height="16" fill="#FF2D78" fillOpacity="0.12" stroke="#FF2D78" strokeWidth="0.5"/>
+              )))}
+            </g>
+
+            {/* ===== ЗДАНИЯ СЛЕВА ===== */}
+            {/* Высотка Котельническая */}
+            <g stroke="#00E5FF" strokeWidth="1" fill="none" opacity="0.65">
+              <rect x="340" y="270" width="56" height="170" fill="#00E5FF" fillOpacity="0.04"/>
+              <rect x="354" y="238" width="28" height="36" fill="#00E5FF" fillOpacity="0.05"/>
+              <rect x="361" y="212" width="14" height="30" fill="#00E5FF" fillOpacity="0.06"/>
+              <line x1="368" y1="212" x2="368" y2="178"/>
+              <polygon points="368,172 372,182 378,182 373,187 375,196 368,191 361,196 363,187 358,182 364,182" fill="#00E5FF" fillOpacity="0.4" stroke="#00E5FF" strokeWidth="0.8"/>
+              {/* Крылья */}
+              <rect x="310" y="310" width="30" height="130" fill="#00E5FF" fillOpacity="0.03"/>
+              <rect x="396" y="310" width="30" height="130" fill="#00E5FF" fillOpacity="0.03"/>
+            </g>
+
+            {/* Обычные здания слева */}
+            <g stroke="#9B30FF" strokeWidth="0.8" fill="none" opacity="0.5">
+              <rect x="160" y="360" width="50" height="80" fill="#9B30FF" fillOpacity="0.04"/>
+              <rect x="215" y="340" width="40" height="100" fill="#9B30FF" fillOpacity="0.04"/>
+              <rect x="260" y="350" width="35" height="90" fill="#9B30FF" fillOpacity="0.04"/>
+              {/* Окна */}
+              {[160, 215, 260].map((bx, bi) => [0,1].map(r => [0,1].map(c => (
+                <rect key={`l${bi}-${r}-${c}`} x={bx+8+c*16} y={370+r*24} width="8" height="12" fill="#9B30FF" fillOpacity="0.12" stroke="#9B30FF" strokeWidth="0.4"/>
+              ))))}
+            </g>
+
+            {/* ===== ОТРАЖЕНИЕ / ГОРИЗОНТАЛЬНАЯ ЛИНИЯ ===== */}
+            <line x1="0" y1="440" x2="1440" y2="440" stroke="#9B30FF" strokeWidth="0.5" strokeOpacity="0.4"/>
+            <rect x="0" y="440" width="1440" height="80" fill="url(#neonViolet)" fillOpacity="0.05"/>
+
+            {/* ===== НЕОНОВЫЕ КОНТУРЫ (свечение поверх) ===== */}
+            {/* Спасская башня — яркий контур */}
+            <rect x="680" y="300" width="48" height="140" stroke="#9B30FF" strokeWidth="1" fill="none" strokeOpacity="0.6"/>
+            <circle cx="704" cy="280" r="8" stroke="#FFD700" strokeWidth="0.8" fill="none" strokeOpacity="0.8"/>
+            {/* Покровский — яркий контур */}
+            <ellipse cx="868" cy="295" rx="22" ry="30" stroke="#00E5FF" strokeWidth="1" fill="none" strokeOpacity="0.7"/>
+            <ellipse cx="832" cy="328" rx="14" ry="18" stroke="#00E5FF" strokeWidth="0.8" fill="none" strokeOpacity="0.6"/>
+            <ellipse cx="904" cy="328" rx="14" ry="18" stroke="#00E5FF" strokeWidth="0.8" fill="none" strokeOpacity="0.6"/>
+          </svg>
+
+          {/* Радиальное свечение под силуэтом */}
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-40 pointer-events-none"
+            style={{ background: "radial-gradient(ellipse at center bottom, rgba(155,48,255,0.12) 0%, rgba(0,229,255,0.06) 50%, transparent 70%)" }} />
+        </div>
+
+        {/* Ambient glows */}
+        <div className="absolute top-1/4 left-1/3 w-[500px] h-[500px] bg-[#9B30FF]/6 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-[#FF2D78]/6 rounded-full blur-[100px] pointer-events-none" />
+        <div className="absolute top-1/2 left-0 w-64 h-64 bg-[#00E5FF]/5 rounded-full blur-[80px] pointer-events-none" />
 
         <div className="container mx-auto px-4 relative z-10 pb-12">
           <div className="flex items-center gap-16 xl:gap-20">
