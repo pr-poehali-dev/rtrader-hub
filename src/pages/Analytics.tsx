@@ -1,118 +1,217 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Icon from "@/components/ui/icon";
-import { analyticsData } from "@/data/analytics";
+import { RenderText } from "@/lib/renderText";
 
 const TG_URL = "https://t.me/RTrader11";
+const VIP_URL = "/vip";
+const API_URL = "https://functions.poehali.dev/1177521b-9812-4631-b339-b216a5d91c4e";
+
+const RISK_COLORS: Record<string, string> = {
+  низкий: "#22c55e", средний: "#FFD700", высокий: "#ff4444",
+};
+
+interface Item {
+  id: number; type: string; instrument: string; title: string; category: string;
+  direction: string; entry: string; target: string; stop: string; risk: string;
+  description: string; body: string; tags: string; video_url: string;
+  image_url: string; created_at: string;
+}
+
+const NAV = (
+  <nav className="fixed top-0 inset-x-0 z-50 bg-black/70 backdrop-blur-xl border-b border-white/10">
+    <div className="max-w-screen-xl mx-auto px-4 py-3 flex items-center justify-between">
+      <Link to="/" className="flex items-center gap-2">
+        <div className="w-8 h-8 rounded-lg brand-gradient-bg flex items-center justify-center shadow-lg">
+          <span className="font-russo text-black text-xs font-black">RT</span>
+        </div>
+        <span className="font-russo text-lg tracking-wider hidden sm:block">R<span className="brand-gradient">TRADER</span></span>
+      </Link>
+      <div className="flex items-center gap-3">
+        <Link to="/" className="text-white/50 hover:text-white text-sm transition-colors flex items-center gap-1.5">
+          <Icon name="ArrowLeft" size={14} /> <span className="hidden sm:inline">На главную</span>
+        </Link>
+        <a href={TG_URL} target="_blank" rel="noopener noreferrer" className="neon-btn text-xs px-3 py-1.5">TG</a>
+      </div>
+    </div>
+  </nav>
+);
 
 export default function Analytics() {
-  const [activeCategory, setActiveCategory] = useState("Все");
+  const [items, setItems] = useState<Item[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeType, setActiveType] = useState("all");
+  const [expanded, setExpanded] = useState<number | null>(null);
 
-  const filtered =
-    activeCategory === "Все"
-      ? analyticsData.ideas
-      : analyticsData.ideas.filter((i) => i.category === activeCategory);
+  useEffect(() => {
+    fetch(`${API_URL}?section=analytics`)
+      .then(r => r.json())
+      .then(d => { setItems(d.items || []); setLoading(false); })
+      .catch(() => setLoading(false));
+  }, []);
+
+  const filtered = activeType === "all" ? items
+    : items.filter(i => (i.type || "signal") === activeType);
+
+  const signals = items.filter(i => (i.type || "signal") === "signal");
+  const reviews = items.filter(i => i.type === "review");
 
   return (
     <div className="neon-grid-bg min-h-screen text-white font-montserrat">
-      {/* NAV */}
-      <nav className="fixed top-0 inset-x-0 z-50 bg-black/70 backdrop-blur-xl border-b border-white/10">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-lg brand-gradient-bg flex items-center justify-center shadow-lg">
-              <span className="font-russo text-black text-sm font-black">RT</span>
-            </div>
-            <span className="font-russo text-xl tracking-wider">
-              R<span className="brand-gradient">TRADER</span>
-            </span>
-          </Link>
-          <div className="flex items-center gap-3">
-            <Link to="/" className="text-white/50 hover:text-white text-sm transition-colors flex items-center gap-1.5">
-              <Icon name="ArrowLeft" size={14} /> На главную
-            </Link>
-            <a href={TG_URL} target="_blank" rel="noopener noreferrer" className="neon-btn text-xs px-4 py-2">
-              Telegram
-            </a>
-          </div>
-        </div>
-      </nav>
+      {NAV}
 
-      <div className="pt-24 pb-16 container mx-auto px-4 max-w-6xl">
-        {/* Header */}
-        <div className="mb-10">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#FFD700] to-[#FF8C00] flex items-center justify-center shadow-lg">
-              <Icon name="TrendingUp" size={22} className="text-black" />
+      <div className="pt-20 pb-16 container mx-auto px-4 max-w-5xl">
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#FFD700] to-[#FF8C00] flex items-center justify-center shadow-lg flex-shrink-0">
+              <Icon name="TrendingUp" size={20} className="text-black" />
             </div>
             <div>
-              <div className="text-xs text-white/30 uppercase tracking-widest font-semibold">Раздел</div>
-              <h1 className="font-russo text-2xl md:text-3xl text-white">{analyticsData.title}</h1>
+              <h1 className="font-russo text-2xl text-white">Аналитика и торговые идеи</h1>
+              <p className="text-white/40 text-xs mt-0.5">
+                {signals.length} сигналов · {reviews.length} обзоров
+              </p>
             </div>
           </div>
-          <p className="text-white/50 text-sm leading-relaxed max-w-2xl">{analyticsData.description}</p>
         </div>
 
-        {/* Фильтр категорий */}
-        <div className="flex flex-wrap gap-2 mb-8">
-          {analyticsData.categories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
+        {/* Переключатель типа */}
+        <div className="flex gap-2 mb-6 flex-wrap">
+          {[
+            { key: "all", label: "Все" },
+            { key: "signal", label: "Сигналы" },
+            { key: "review", label: "Обзоры" },
+          ].map(t => (
+            <button key={t.key} onClick={() => setActiveType(t.key)}
               className={`px-4 py-1.5 rounded-full text-xs font-semibold transition-all ${
-                activeCategory === cat
-                  ? "bg-[#FFD700] text-black"
-                  : "glass-card text-white/50 hover:text-white"
-              }`}
-            >
-              {cat}
+                activeType === t.key ? "bg-[#FFD700] text-black" : "glass-card text-white/50 hover:text-white"
+              }`}>
+              {t.label}
             </button>
           ))}
         </div>
 
-        {/* Идеи */}
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-12">
-          {filtered.map((idea) => (
-            <div key={idea.id} className="glass-card p-5 flex flex-col gap-3 hover:border-white/20 transition-all">
-              <div className="flex items-start justify-between gap-2">
-                <div>
-                  <div className="text-xs text-white/30 mb-1">{idea.category} · {idea.date}</div>
-                  <div className="font-russo text-base text-white leading-tight">{idea.title}</div>
-                </div>
-                <span
-                  className={`text-xs px-2.5 py-1 rounded-full font-bold flex-shrink-0 ${
-                    idea.direction === "long"
-                      ? "bg-green-500/15 text-green-400 border border-green-500/30"
-                      : "bg-red-500/15 text-red-400 border border-red-500/30"
-                  }`}
-                >
-                  {idea.direction === "long" ? "LONG" : "SHORT"}
-                </span>
-              </div>
+        {loading ? (
+          <div className="flex items-center justify-center py-20 text-white/30">
+            <Icon name="Loader2" size={24} className="animate-spin" />
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="glass-card p-12 text-center text-white/30 text-sm">Записей пока нет</div>
+        ) : (
+          <div className="flex flex-col gap-4 mb-12">
+            {filtered.map(item => {
+              const isSignal = (item.type || "signal") === "signal";
+              const isOpen = expanded === item.id;
+              const dateStr = item.created_at ? item.created_at.split("T")[0] : "";
+              const tagList = (item.tags || "").split(",").map(t => t.trim()).filter(Boolean);
 
-              <p className="text-white/45 text-sm leading-relaxed flex-1">{idea.description}</p>
+              return (
+                <div key={item.id} className="glass-card overflow-hidden transition-all hover:border-white/20">
+                  {/* Обложка */}
+                  {item.image_url && (
+                    <div className="w-full overflow-hidden border-b border-white/8">
+                      <img src={item.image_url} alt={item.title}
+                        className="w-full h-auto max-h-80 object-contain bg-white/3" />
+                    </div>
+                  )}
+                  <div className="p-5">
+                    {/* Шапка */}
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                          <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
+                            isSignal ? "bg-green-500/15 text-green-400" : "bg-[#FFD700]/15 text-[#FFD700]"
+                          }`}>
+                            {isSignal ? "СИГНАЛ" : "ОБЗОР"}
+                          </span>
+                          {isSignal && item.instrument && (
+                            <span className="font-russo text-sm text-[#FFD700]">{item.instrument}</span>
+                          )}
+                          {isSignal && (
+                            <span className={`text-xs px-2 py-0.5 rounded-full font-bold border ${
+                              item.direction === "long"
+                                ? "bg-green-500/10 text-green-400 border-green-500/30"
+                                : "bg-red-500/10 text-red-400 border-red-500/30"
+                            }`}>
+                              {item.direction?.toUpperCase()}
+                            </span>
+                          )}
+                          {tagList.map(t => (
+                            <span key={t} className="text-xs px-1.5 py-0.5 rounded-md bg-white/5 text-white/40">{t}</span>
+                          ))}
+                          <span className="text-xs text-white/25">{dateStr}</span>
+                        </div>
+                        <h3 className="font-russo text-base text-white leading-tight">{item.title}</h3>
+                      </div>
+                    </div>
 
-              <div className="grid grid-cols-3 gap-2 pt-2 border-t border-white/8">
-                <div>
-                  <div className="text-xs text-white/30 mb-0.5">Вход</div>
-                  <div className="text-xs font-semibold text-white/70">{idea.entry}</div>
-                </div>
-                <div>
-                  <div className="text-xs text-white/30 mb-0.5">Цель</div>
-                  <div className="text-xs font-semibold text-green-400">{idea.target}</div>
-                </div>
-                <div>
-                  <div className="text-xs text-white/30 mb-0.5">Стоп</div>
-                  <div className="text-xs font-semibold text-red-400">{idea.stop}</div>
-                </div>
-              </div>
+                    {/* Точки сигнала */}
+                    {isSignal && (
+                      <div className="grid grid-cols-3 gap-3 mb-3 p-3 bg-white/3 rounded-xl border border-white/8">
+                        <div>
+                          <div className="text-xs text-white/30 mb-0.5">Вход</div>
+                          <div className="text-sm font-semibold text-white/80">{item.entry || "—"}</div>
+                        </div>
+                        <div>
+                          <div className="text-xs text-white/30 mb-0.5">Цель</div>
+                          <div className="text-sm font-semibold text-green-400">{item.target || "—"}</div>
+                        </div>
+                        <div>
+                          <div className="text-xs text-white/30 mb-0.5">Стоп</div>
+                          <div className="text-sm font-semibold text-red-400">{item.stop || "—"}</div>
+                        </div>
+                      </div>
+                    )}
 
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-white/30">Риск: {idea.risk}</span>
-                <span className="font-russo text-sm" style={{ color: idea.accent }}>{idea.instrument}</span>
-              </div>
-            </div>
-          ))}
-        </div>
+                    {/* Краткое описание */}
+                    {(item.description || (isSignal ? "" : item.body)) && (
+                      <div className="mb-3">
+                        {isSignal ? (
+                          <p className="text-white/50 text-sm leading-relaxed">{item.description}</p>
+                        ) : !isOpen && (
+                          <p className="text-white/50 text-sm leading-relaxed line-clamp-3">{item.body}</p>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Полный текст обзора */}
+                    {!isSignal && item.body && isOpen && (
+                      <div className="mb-4 pt-3 border-t border-white/8">
+                        <RenderText text={item.body} accent="#FFD700" className="text-white/60 text-sm" />
+                      </div>
+                    )}
+
+                    {/* Футер */}
+                    <div className="flex items-center justify-between flex-wrap gap-2 pt-2 border-t border-white/8">
+                      <div className="flex items-center gap-3">
+                        {isSignal && item.risk && (
+                          <span className="text-xs flex items-center gap-1">
+                            <span className="w-1.5 h-1.5 rounded-full inline-block"
+                              style={{ background: RISK_COLORS[item.risk] || "#FFD700" }} />
+                            <span className="text-white/40">Риск: {item.risk}</span>
+                          </span>
+                        )}
+                        {item.video_url && (
+                          <a href={item.video_url} target="_blank" rel="noopener noreferrer"
+                            className="text-xs flex items-center gap-1 text-[#FFD700]/70 hover:text-[#FFD700] transition-colors">
+                            <Icon name="Play" size={11} /> Видеообзор
+                          </a>
+                        )}
+                      </div>
+                      {!isSignal && item.body && (
+                        <button onClick={() => setExpanded(isOpen ? null : item.id)}
+                          className="text-xs flex items-center gap-1 text-[#FFD700]/70 hover:text-[#FFD700] transition-colors font-semibold">
+                          {isOpen ? "Свернуть" : "Читать полностью"}
+                          <Icon name={isOpen ? "ChevronUp" : "ChevronDown"} size={12} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         {/* CTA */}
         <div className="glass-card p-8 text-center">
@@ -122,12 +221,8 @@ export default function Analytics() {
             В VIP — торговые сигналы в реальном времени с точными точками входа, целями и стопами.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link to="/vip" className="neon-btn px-6 py-2.5 text-sm">
-              Узнать о VIP-клубе
-            </Link>
-            <a href={TG_URL} target="_blank" rel="noopener noreferrer" className="neon-btn-outline px-6 py-2.5 text-sm">
-              Telegram-канал
-            </a>
+            <Link to={VIP_URL} className="neon-btn px-6 py-2.5 text-sm">Узнать о VIP-клубе</Link>
+            <a href={TG_URL} target="_blank" rel="noopener noreferrer" className="neon-btn-outline px-6 py-2.5 text-sm">Telegram-канал</a>
           </div>
         </div>
       </div>

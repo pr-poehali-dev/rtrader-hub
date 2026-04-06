@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import Icon from "@/components/ui/icon";
 
 const TG_URL = "https://t.me/RTrader11";
@@ -18,7 +18,9 @@ interface Article {
 export default function Reflections() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTag, setActiveTag] = useState("Все");
+  const [searchParams] = useSearchParams();
+  const urlTag = searchParams.get("tag");
+  const [activeTag, setActiveTag] = useState(urlTag && TAGS.includes(urlTag) ? urlTag : "Все");
 
   useEffect(() => {
     fetch(`${API_URL}?section=reflections`)
