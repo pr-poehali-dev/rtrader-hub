@@ -1,0 +1,12 @@
+{
+  "tests": [
+    {
+      "name": "POST без пароля — 401 или 500",
+      "method": "POST",
+      "path": "/",
+      "body": { "password": "" },
+      "expectedStatus": 500,
+      "bodyMatcher": "partial"
+    }
+  ]
+}

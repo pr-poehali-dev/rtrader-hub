@@ -12,6 +12,7 @@ import Tournaments from "./pages/Tournaments";
 import Vip from "./pages/Vip";
 import Education from "./pages/Education";
 import Reviews from "./pages/Reviews";
+import Admin from "./pages/admin/Admin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,7 @@ const App = () => (
           <Route path="/vip" element={<Vip />} />
           <Route path="/education" element={<Education />} />
           <Route path="/reviews" element={<Reviews />} />
+          <Route path="/admin/*" element={<Admin />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
