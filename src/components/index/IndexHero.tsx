@@ -431,10 +431,7 @@ export default function IndexHero({ scrolled, menuOpen, setMenuOpen, navTo }: In
           </div>
         </div>
 
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-white/25 text-xs">
-          <span className="uppercase tracking-widest text-[10px]">Прокрути</span>
-          <Icon name="ChevronDown" size={16} className="animate-bounce" />
-        </div>
+
       </section>
 
       {/* TICKER */}
