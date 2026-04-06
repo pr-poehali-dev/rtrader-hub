@@ -101,57 +101,47 @@ def fetch_moex_stocks():
         return []
 
 
-def fetch_moex_index():
-    """Получить значение индекса IMOEX."""
+def fetch_moex_index_change():
+    """Получить индекс IMOEX: текущее значение + изменение к открытию."""
     url = (
         "https://iss.moex.com/iss/engines/stock/markets/index/boards/SNDX/securities.json"
-        f"?securities={MOEX_INDEX}&iss.meta=off&iss.only=marketdata"
-        "&marketdata.columns=SECID,CURRENTVALUE,LASTVALUE,VALTODAY"
+        "?securities=IMOEX&iss.meta=off"
+        "&iss.only=marketdata,securities"
+        "&marketdata.columns=SECID,CURRENTVALUE,OPEN"
+        "&securities.columns=SECID,PREVPRICE"
     )
     try:
         req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
         with urllib.request.urlopen(req, timeout=8) as r:
             d = json.loads(r.read())
-        rows = d["marketdata"]["data"]
-        for row in rows:
-            if row[0] == MOEX_INDEX:
-                val = row[1] or row[2]
-                if not val:
-                    continue
-                # Считаем изменение через предыдущее закрытие отдельным запросом
-                return {"value": val}
-        return None
-    except Exception:
-        return None
 
+        md = {row[0]: row for row in d["marketdata"]["data"]}
+        sc = {row[0]: row for row in d["securities"]["data"]}
 
-def fetch_moex_index_change():
-    """Получить индекс IMOEX с изменением через history."""
-    url = (
-        "https://iss.moex.com/iss/engines/stock/markets/index/securities/IMOEX.json"
-        "?iss.meta=off&iss.only=marketdata"
-        "&marketdata.columns=CURRENTVALUE,OPEN"
-    )
-    try:
-        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-        with urllib.request.urlopen(req, timeout=8) as r:
-            d = json.loads(r.read())
-        rows = d["marketdata"]["data"]
-        if rows and rows[0][0]:
-            cur  = rows[0][0]
-            open_ = rows[0][1] or cur
-            pct  = ((cur - open_) / open_ * 100) if open_ else 0
-            return {
-                "name": "IMOEX",
-                "price": fmt_price(cur),
-                "change": fmt_change(pct),
-                "up": pct >= 0,
-                "raw_price": cur,
-                "raw_change_pct": round(pct, 2),
-                "source": "moex",
-                "is_index": True,
-            }
-        return None
+        row = md.get("IMOEX")
+        if not row:
+            return None
+
+        cur   = row[1]
+        open_ = row[2]
+        prev  = (sc.get("IMOEX") or [None, None])[1]
+
+        if not cur:
+            return None
+
+        base = open_ or prev or cur
+        pct  = ((cur - base) / base * 100) if base else 0
+
+        return {
+            "name": "IMOEX",
+            "price": fmt_price(cur),
+            "change": fmt_change(pct),
+            "up": pct >= 0,
+            "raw_price": cur,
+            "raw_change_pct": round(pct, 2),
+            "source": "moex",
+            "is_index": True,
+        }
     except Exception:
         return None
 
