@@ -24,6 +24,11 @@ export default {
 				mono: ['IBM Plex Mono', 'monospace'],
 			},
 			colors: {
+				'neon-yellow': '#FFD700',
+				'neon-cyan':   '#00E5FF',
+				'neon-purple': '#9B30FF',
+				'neon-pink':   '#FF2D78',
+				'neon-orange': '#FF8C00',
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
 				ring: 'hsl(var(--ring))',

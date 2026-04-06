@@ -99,3 +99,271 @@
     background-color: hsl(var(--red));
   }
 }
+
+/* =====================================================
+   PORTAL STYLES — неоновый дизайн портала rtrader11.ru
+   ===================================================== */
+
+/* Шрифты портала */
+@import url("https://fonts.googleapis.com/css2?family=Russo+One&family=Montserrat:wght@300;400;500;600;700&display=swap");
+
+.font-russo {
+  font-family: "Russo One", sans-serif;
+}
+.font-montserrat {
+  font-family: "Montserrat", sans-serif;
+}
+
+/* Цветовые переменные портала */
+:root {
+  --neon-yellow: #ffd700;
+  --neon-cyan: #00e5ff;
+  --neon-purple: #9b30ff;
+  --neon-pink: #ff2d78;
+  --neon-orange: #ff8c00;
+  --bg-deep: #06051a;
+}
+
+/* Цвета Tailwind */
+.text-neon-yellow {
+  color: var(--neon-yellow);
+}
+.text-neon-cyan {
+  color: var(--neon-cyan);
+}
+.text-neon-purple {
+  color: var(--neon-purple);
+}
+.text-neon-pink {
+  color: var(--neon-pink);
+}
+.bg-neon-yellow\/10 {
+  background-color: rgba(255, 215, 0, 0.1);
+}
+.bg-neon-yellow\/15 {
+  background-color: rgba(255, 215, 0, 0.15);
+}
+.bg-neon-cyan\/15 {
+  background-color: rgba(0, 229, 255, 0.15);
+}
+.border-neon-yellow\/20 {
+  border-color: rgba(255, 215, 0, 0.2);
+}
+.border-neon-yellow\/40 {
+  border-color: rgba(255, 215, 0, 0.4);
+}
+.border-neon-cyan\/40 {
+  border-color: rgba(0, 229, 255, 0.4);
+}
+
+/* Фоновая сетка */
+.neon-grid-bg {
+  background-color: var(--bg-deep);
+  background-image:
+    linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* Градиент бренда */
+.brand-gradient {
+  background: linear-gradient(
+    135deg,
+    var(--neon-cyan) 0%,
+    var(--neon-purple) 50%,
+    var(--neon-pink) 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.brand-gradient-bg {
+  background: linear-gradient(
+    135deg,
+    var(--neon-cyan) 0%,
+    var(--neon-purple) 50%,
+    var(--neon-pink) 100%
+  );
+}
+
+/* Стеклянная карточка */
+.glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Неоновые кнопки */
+.neon-btn {
+  background: linear-gradient(
+    135deg,
+    var(--neon-yellow) 0%,
+    var(--neon-orange) 100%
+  );
+  color: #000;
+  font-weight: 700;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    opacity 0.2s,
+    box-shadow 0.2s,
+    transform 0.15s;
+  box-shadow:
+    0 0 20px rgba(255, 215, 0, 0.3),
+    0 4px 15px rgba(0, 0, 0, 0.3);
+  text-decoration: none;
+}
+.neon-btn:hover {
+  opacity: 0.9;
+  box-shadow:
+    0 0 30px rgba(255, 215, 0, 0.5),
+    0 6px 20px rgba(0, 0, 0, 0.4);
+  transform: translateY(-1px);
+}
+
+.neon-btn-outline {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.75);
+  font-weight: 600;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    border-color 0.2s,
+    color 0.2s,
+    box-shadow 0.2s;
+  text-decoration: none;
+}
+.neon-btn-outline:hover {
+  border-color: var(--neon-cyan);
+  color: var(--neon-cyan);
+  box-shadow: 0 0 16px rgba(0, 229, 255, 0.2);
+}
+
+/* Навигационные ссылки */
+.nav-link {
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 500;
+  transition: color 0.2s;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.nav-link:hover {
+  color: #fff;
+}
+
+/* Бегущая строка */
+.ticker-wrap {
+  background: rgba(0, 0, 0, 0.4);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+/* Карточка карусели */
+.carousel-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  backdrop-filter: blur(8px);
+}
+
+/* Карточка отзыва */
+.review-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+}
+
+/* VIP карточка */
+.vip-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(155, 48, 255, 0.3);
+  border-radius: 20px;
+  box-shadow:
+    0 0 60px rgba(155, 48, 255, 0.15),
+    0 0 120px rgba(255, 45, 120, 0.1);
+}
+
+/* Карточка скриншота */
+.screenshot-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 14px;
+}
+
+/* Анимации */
+@keyframes ticker {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+.animate-ticker {
+  animation: ticker 35s linear infinite;
+}
+
+@keyframes glow-pulse {
+  0%,
+  100% {
+    box-shadow:
+      0 0 60px rgba(155, 48, 255, 0.15),
+      0 0 120px rgba(255, 45, 120, 0.1);
+  }
+  50% {
+    box-shadow:
+      0 0 80px rgba(155, 48, 255, 0.3),
+      0 0 160px rgba(255, 45, 120, 0.2);
+  }
+}
+.animate-glow-pulse {
+  animation: glow-pulse 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in-up {
+  animation: fade-in-up 0.6s ease both;
+}
+
+/* Скрыть скроллбар */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
