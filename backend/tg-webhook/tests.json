@@ -1,0 +1,17 @@
+{
+  "tests": [
+    {
+      "name": "OPTIONS preflight",
+      "method": "OPTIONS",
+      "path": "/",
+      "expectedStatus": 200
+    },
+    {
+      "name": "POST empty body returns ok",
+      "method": "POST",
+      "path": "/",
+      "body": {},
+      "expectedStatus": 200
+    }
+  ]
+}
