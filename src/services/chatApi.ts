@@ -1,80 +1,111 @@
-/**
- * Абстрактный API-слой для чата.
- *
- * Сейчас все функции работают с мок-данными в памяти.
- * Чтобы подключить реальный backend (Supabase, собственный HTTP-сервер),
- * достаточно заменить тела функций ниже — компоненты и хуки переписывать не нужно.
- *
- * Пример замены на Supabase:
- *   getMessages: async (channelId) => {
- *     const { data } = await supabase.from('messages').select('*').eq('channel_id', channelId);
- *     return data;
- *   }
- *
- * Пример замены на собственный HTTP backend:
- *   getMessages: async (channelId) => {
- *     const res = await fetch(`${API_BASE_URL}/channels/${channelId}/messages`);
- *     return res.json();
- *   }
- */
-
 import type { Channel, Message, SendMessagePayload, User } from "@/types/chat";
-import {
-  MOCK_CHANNELS,
-  MOCK_CURRENT_USER,
-  MOCK_MESSAGES,
-} from "./mockData";
+import func2url from "../../backend/func2url.json";
 
-const delay = (ms = 200) => new Promise((r) => setTimeout(r, ms));
+const CHAT_URL = (func2url as Record<string, string>).chat;
 
-const localMessages: Record<string, Message[]> = Object.fromEntries(
-  Object.entries(MOCK_MESSAGES).map(([k, v]) => [k, [...v]])
-);
+function getToken(): string {
+  return localStorage.getItem("auth_token") || "";
+}
 
-const channelUnread: Record<string, number> = Object.fromEntries(
-  MOCK_CHANNELS.map((c) => [c.id, c.unreadCount])
-);
+function authHeaders() {
+  return { "X-Auth-Token": getToken(), "Content-Type": "application/json" };
+}
+
+const CHANNELS_META: Omit<Channel, "unreadCount" | "lastMessage" | "lastMessageAt">[] = [
+  { id: "chat",     name: "общий-чат",          description: "Общие обсуждения рынка",       icon: "Hash",       category: "general" },
+  { id: "intraday", name: "интрадей-идеи",       description: "Внутридневные торговые идеи",  icon: "TrendingUp", category: "trading" },
+  { id: "metals",   name: "металлы",             description: "Золото, серебро, платина",      icon: "Gem",        category: "trading" },
+  { id: "oil",      name: "газ-и-нефть",         description: "Газ, нефть, энергоносители",   icon: "Flame",      category: "trading" },
+  { id: "products", name: "акции-и-фонда",       description: "Акции и фондовый рынок",       icon: "BarChart2",  category: "trading" },
+  { id: "tech",     name: "техподдержка",         description: "Технические вопросы",          icon: "Wrench",     category: "general" },
+  { id: "video",       name: "видео",            description: "Обучающие видео",              icon: "Play",       category: "general" },
+  { id: "knowledge",   name: "база-знаний",      description: "Полезные материалы",           icon: "BookOpen",   category: "general" },
+  { id: "access_info", name: "инфо-о-доступе",  description: "Информация о подписке",        icon: "Info",       category: "general" },
+];
+
+function formatTime(isoStr: string): string {
+  try {
+    return new Date(isoStr).toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
+  } catch {
+    return "";
+  }
+}
+
+function makeInitials(name: string): string {
+  return name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
+}
+
+function mapRole(role: string): User["role"] {
+  if (role === "owner" || role === "admin") return "admin";
+  return "member";
+}
+
+function mapMessage(raw: { id: number; text: string; created_at: string; nickname: string; role: string }, channelId: string): Message {
+  return {
+    id: String(raw.id),
+    channelId,
+    text: raw.text,
+    createdAt: formatTime(raw.created_at),
+    author: {
+      id: raw.nickname,
+      name: raw.nickname,
+      initials: makeInitials(raw.nickname),
+      role: mapRole(raw.role),
+      isOnline: false,
+    },
+  };
+}
 
 export const chatApi = {
   getCurrentUser: async (): Promise<User> => {
-    await delay(100);
-    return MOCK_CURRENT_USER;
+    const token = getToken();
+    if (!token) return { id: "guest", name: "Гость", initials: "ГС", role: "member", isOnline: false };
+    const r = await fetch(`${(func2url as Record<string, string>).auth}?action=me`, {
+      headers: { "X-Auth-Token": token },
+    });
+    const d = await r.json();
+    if (!d.user) return { id: "guest", name: "Гость", initials: "ГС", role: "member", isOnline: false };
+    return {
+      id: String(d.user.id),
+      name: d.user.nickname,
+      initials: makeInitials(d.user.nickname),
+      role: mapRole(d.user.role),
+      isOnline: true,
+    };
   },
 
   getChannels: async (): Promise<Channel[]> => {
-    await delay(150);
-    return MOCK_CHANNELS.map((c) => ({
-      ...c,
-      unreadCount: channelUnread[c.id] ?? 0,
-    }));
+    return CHANNELS_META.map(ch => ({ ...ch, unreadCount: 0 }));
   },
 
   getMessages: async (channelId: string): Promise<Message[]> => {
-    await delay(200);
-    return localMessages[channelId] ?? [];
+    const r = await fetch(`${CHAT_URL}?action=messages&channel=${channelId}&limit=60`, {
+      headers: authHeaders(),
+    });
+    if (!r.ok) return [];
+    const d = await r.json();
+    return (d.messages || []).map((m: Parameters<typeof mapMessage>[0]) => mapMessage(m, channelId));
   },
 
   sendMessage: async (payload: SendMessagePayload): Promise<Message> => {
-    await delay(150);
-    const newMsg: Message = {
+    const r = await fetch(`${CHAT_URL}?action=send`, {
+      method: "POST",
+      headers: authHeaders(),
+      body: JSON.stringify({ channel: payload.channelId, text: payload.text }),
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.error || "Ошибка отправки");
+    const user = await chatApi.getCurrentUser();
+    return {
       id: `msg_${Date.now()}`,
       channelId: payload.channelId,
-      author: MOCK_CURRENT_USER,
       text: payload.text,
-      createdAt: new Date().toLocaleTimeString("ru-RU", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
+      createdAt: new Date().toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" }),
+      author: user,
     };
-    if (!localMessages[payload.channelId]) {
-      localMessages[payload.channelId] = [];
-    }
-    localMessages[payload.channelId].push(newMsg);
-    return newMsg;
   },
 
-  markAsRead: async (channelId: string): Promise<void> => {
-    await delay(50);
-    channelUnread[channelId] = 0;
+  markAsRead: async (_channelId: string): Promise<void> => {
+    // unread tracking на backend не реализован, просто игнорируем
   },
 };

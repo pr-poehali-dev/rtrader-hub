@@ -7,8 +7,6 @@ import MessageInput from "@/components/chat/MessageInput";
 import { useChannels, useMessages, useSendMessage, useMarkAsRead, useCurrentUser } from "@/hooks/useChat";
 import type { Channel } from "@/types/chat";
 import { cn } from "@/lib/utils";
-import { MOCK_USERS } from "@/services/mockData";
-
 export default function Community() {
   const [activeChannel, setActiveChannel] = useState<Channel | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -30,8 +28,6 @@ export default function Community() {
     sendMessage.mutate({ channelId: activeChannel.id, text });
   };
 
-  const onlineCount = MOCK_USERS.filter((u) => u.isOnline).length;
-
   return (
     <div className="h-screen flex flex-col bg-[hsl(var(--background))] text-white overflow-hidden">
       {/* Top bar */}
@@ -45,8 +41,8 @@ export default function Community() {
         <span className="text-white/30 text-sm font-medium">Комьюнити</span>
         <div className="ml-auto flex items-center gap-3">
           <div className="flex items-center gap-1.5 text-xs text-white/40">
-            <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" />
-            {onlineCount} онлайн
+            <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block animate-pulse" />
+            онлайн
           </div>
           <button
             className="lg:hidden text-white/50 hover:text-white transition-colors"
@@ -90,28 +86,7 @@ export default function Community() {
             />
           )}
 
-          {/* Online members */}
-          <div className="border-t border-white/5 p-3">
-            <p className="text-xs text-white/25 uppercase tracking-widest mb-2">Участники онлайн</p>
-            <div className="space-y-1">
-              {MOCK_USERS.filter((u) => u.isOnline).map((u) => (
-                <div key={u.id} className="flex items-center gap-2">
-                  <div className="relative">
-                    <div className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-[9px] font-bold text-white/60">
-                      {u.initials}
-                    </div>
-                    <span className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-green-400 border border-black" />
-                  </div>
-                  <span className={cn(
-                    "text-xs truncate",
-                    u.role === "admin" ? "text-neon-cyan" : u.role === "vip" ? "text-neon-yellow" : "text-white/50"
-                  )}>
-                    {u.name}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
+
         </aside>
 
         {/* Main chat area */}
