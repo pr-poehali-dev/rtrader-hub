@@ -3,7 +3,6 @@ import { Link, useSearchParams } from "react-router-dom";
 import Icon from "@/components/ui/icon";
 
 const API_URL = "https://functions.poehali.dev/1177521b-9812-4631-b339-b216a5d91c4e";
-const AUTHOR_API = "https://functions.poehali.dev/1177521b-9812-4631-b339-b216a5d91c4e";
 
 const TAGS = ["Все", "Психология", "Дисциплина", "Эмоции"];
 const TAG_ACCENTS: Record<string, string> = {
@@ -19,14 +18,10 @@ interface Cta {
   eyebrow: string; title: string; text: string; btn: string; url: string;
 }
 
-const DEFAULT_CTA: Cta = {
-  eyebrow: "", title: "", text: "", btn: "", url: "",
-};
-
 export default function Reflections() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
-  const [cta, setCta] = useState<Cta>(DEFAULT_CTA);
+  const [cta, setCta] = useState<Cta>({ eyebrow: "", title: "", text: "", btn: "", url: "" });
   const [searchParams] = useSearchParams();
   const urlTag = searchParams.get("tag");
   const [activeTag, setActiveTag] = useState(urlTag && TAGS.includes(urlTag) ? urlTag : "Все");
@@ -37,7 +32,7 @@ export default function Reflections() {
       .then(d => { setArticles(d.items || []); setLoading(false); })
       .catch(() => setLoading(false));
 
-    fetch(`${AUTHOR_API}?section=author`)
+    fetch(`${API_URL}?section=author`)
       .then(r => r.json())
       .then(d => {
         if (d.item) {
@@ -63,31 +58,28 @@ export default function Reflections() {
   return (
     <div className="neon-grid-bg min-h-screen text-white font-montserrat">
       <nav className="fixed top-0 inset-x-0 z-50 bg-black/70 backdrop-blur-xl border-b border-white/10">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-lg brand-gradient-bg flex items-center justify-center shadow-lg">
-              <span className="font-russo text-black text-sm font-black">RT</span>
+        <div className="max-w-screen-xl mx-auto px-4 py-3 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg brand-gradient-bg flex items-center justify-center shadow-lg">
+              <span className="font-russo text-black text-xs font-black">RT</span>
             </div>
-            <span className="font-russo text-xl tracking-wider">R<span className="brand-gradient">TRADER</span></span>
+            <span className="font-russo text-lg tracking-wider hidden sm:block">R<span className="brand-gradient">TRADER</span></span>
           </Link>
-          <div className="flex items-center gap-3">
-            <Link to="/" className="text-white/50 hover:text-white text-sm transition-colors flex items-center gap-1.5">
-              <Icon name="ArrowLeft" size={14} /> На главную
-            </Link>
-            <a href={TG_URL} target="_blank" rel="noopener noreferrer" className="neon-btn text-xs px-4 py-2">Telegram</a>
-          </div>
+          <Link to="/" className="text-white/50 hover:text-white text-sm transition-colors flex items-center gap-1.5">
+            <Icon name="ArrowLeft" size={14} /> На главную
+          </Link>
         </div>
       </nav>
 
-      <div className="pt-24 pb-16 container mx-auto px-4 max-w-6xl">
-        <div className="mb-10">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#9B30FF] to-[#FF2D78] flex items-center justify-center shadow-lg">
-              <Icon name="Brain" size={22} className="text-white" />
+      <div className="pt-20 pb-16 container mx-auto px-4 max-w-6xl">
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#9B30FF] to-[#FF2D78] flex items-center justify-center shadow-lg flex-shrink-0">
+              <Icon name="Brain" size={20} className="text-white" />
             </div>
             <div>
               <div className="text-xs text-white/30 uppercase tracking-widest font-semibold">Раздел</div>
-              <h1 className="font-russo text-2xl md:text-3xl text-white">Рефлексии трейдера</h1>
+              <h1 className="font-russo text-2xl text-white">Рефлексии трейдера</h1>
             </div>
           </div>
           <p className="text-white/50 text-sm leading-relaxed max-w-2xl">
@@ -115,7 +107,7 @@ export default function Reflections() {
             Материалов пока нет — скоро появятся
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-8">
             {filtered.map(article => {
               const tagList = (article.tags || article.tag || "").split(",").map((t: string) => t.trim()).filter(Boolean);
               const accent = TAG_ACCENTS[tagList[0]] || "#9B30FF";
@@ -129,7 +121,7 @@ export default function Reflections() {
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                     </div>
                   )}
-                  <div className="p-6 flex flex-col gap-3 flex-1">
+                  <div className="p-5 flex flex-col gap-3 flex-1">
                     <div className="flex items-center justify-between flex-wrap gap-2">
                       <div className="flex gap-1.5 flex-wrap">
                         {tagList.map(t => (
@@ -159,6 +151,7 @@ export default function Reflections() {
           </div>
         )}
 
+        {/* CTA-блок — только если заполнен через CMS */}
         {(cta.title || cta.btn) && (
           <div className="glass-card px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
             <div className="flex-1 min-w-0">
@@ -176,7 +169,7 @@ export default function Reflections() {
               <a href={cta.url}
                 target={cta.url.startsWith("http") ? "_blank" : undefined}
                 rel={cta.url.startsWith("http") ? "noopener noreferrer" : undefined}
-                className="neon-btn text-xs px-5 py-2 whitespace-nowrap flex-shrink-0 inline-flex items-center gap-1.5">
+                className="neon-btn text-xs px-5 py-2 whitespace-nowrap flex-shrink-0">
                 {cta.btn}
               </a>
             )}

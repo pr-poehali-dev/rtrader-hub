@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import Icon from "@/components/ui/icon";
 import { RenderText } from "@/lib/renderText";
 
-const TG_URL = "https://t.me/RTrader11";
 const API_URL = "https://functions.poehali.dev/1177521b-9812-4631-b339-b216a5d91c4e";
 
 const STATUS_META: Record<string, { label: string; color: string }> = {
@@ -207,17 +206,7 @@ export default function Tournaments() {
           </div>
         )}
 
-        {/* CTA */}
-        <div className="glass-card p-8 text-center">
-          <div className="text-xs text-white/30 uppercase tracking-widest mb-2">Хочешь участвовать?</div>
-          <h2 className="font-russo text-xl text-white mb-3">Участие в конкурсах — в Telegram</h2>
-          <p className="text-white/45 text-sm mb-6 max-w-md mx-auto">
-            Следи за анонсами конкурсов в Telegram-канале и участвуй в соревнованиях.
-          </p>
-          <a href={TG_URL} target="_blank" rel="noopener noreferrer" className="neon-btn px-6 py-2.5 text-sm">
-            Открыть Telegram
-          </a>
-        </div>
+
       </div>
     </div>
   );
