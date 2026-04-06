@@ -1,28 +1,42 @@
 import { useState, useEffect } from "react";
 import { TICKER_DATA } from "./data";
+import { useQuotes } from "@/hooks/useQuotes";
 
 export function TickerBar() {
   const [offset, setOffset] = useState(0);
+  const { data: quotes = [] } = useQuotes();
+
+  const items = quotes.length > 0
+    ? [...quotes, ...quotes, ...quotes]
+    : [...TICKER_DATA, ...TICKER_DATA, ...TICKER_DATA];
+
+  const itemWidth = 160;
+
   useEffect(() => {
-    const id = setInterval(() => setOffset(p => (p - 1) % (TICKER_DATA.length * 160)), 30);
+    const id = setInterval(() => setOffset(p => (p - 1) % (items.length / 3 * itemWidth)), 30);
     return () => clearInterval(id);
-  }, []);
-  const items = [...TICKER_DATA, ...TICKER_DATA, ...TICKER_DATA];
+  }, [items.length]);
+
   return (
     <div className="h-8 flex items-center overflow-hidden bg-card border-b border-border">
       <div
         className="flex items-center gap-8 whitespace-nowrap pl-4"
         style={{ transform: `translateX(${offset}px)`, transition: "none" }}
       >
-        {items.map((t, i) => (
-          <div key={i} className="flex items-center gap-2 flex-shrink-0">
-            <span className="font-mono text-xs text-muted-foreground">{t.sym}</span>
-            <span className="font-mono text-xs font-medium text-foreground">{t.price}</span>
-            <span className={`font-mono text-xs ${t.change.startsWith("+") ? "text-green" : "text-red"}`}>
-              {t.change}
-            </span>
-          </div>
-        ))}
+        {items.map((t, i) => {
+          const isReal = quotes.length > 0;
+          const sym   = isReal ? (t as typeof quotes[0]).name  : (t as typeof TICKER_DATA[0]).sym;
+          const price = isReal ? (t as typeof quotes[0]).price : (t as typeof TICKER_DATA[0]).price;
+          const change = isReal ? (t as typeof quotes[0]).change : (t as typeof TICKER_DATA[0]).change;
+          const up    = isReal ? (t as typeof quotes[0]).up : change.startsWith("+");
+          return (
+            <div key={i} className="flex items-center gap-2 flex-shrink-0">
+              <span className="font-mono text-xs text-muted-foreground">{sym}</span>
+              <span className="font-mono text-xs font-medium text-foreground">{price}</span>
+              <span className={`font-mono text-xs ${up ? "text-green" : "text-red"}`}>{change}</span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
