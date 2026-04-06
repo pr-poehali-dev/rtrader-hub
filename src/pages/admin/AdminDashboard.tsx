@@ -11,7 +11,7 @@ export default function AdminDashboard() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
         <Link
-          to="/admin/reviews"
+          to="/rt-manage/reviews"
           className="glass-card p-6 flex flex-col gap-3 hover:border-[#FFD700]/30 transition-all group"
         >
           <div className="w-10 h-10 rounded-xl bg-[#FFD700]/10 border border-[#FFD700]/20 flex items-center justify-center">
@@ -29,7 +29,7 @@ export default function AdminDashboard() {
         </Link>
 
         <Link
-          to="/admin/content"
+          to="/rt-manage/content"
           className="glass-card p-6 flex flex-col gap-3 hover:border-[#00E5FF]/30 transition-all group"
         >
           <div className="w-10 h-10 rounded-xl bg-[#00E5FF]/10 border border-[#00E5FF]/20 flex items-center justify-center">

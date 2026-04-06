@@ -7,9 +7,9 @@ interface Props {
 }
 
 const NAV = [
-  { href: "/admin", label: "Обзор", icon: "LayoutDashboard", exact: true },
-  { href: "/admin/reviews", label: "Отзывы", icon: "MessageSquare", exact: false },
-  { href: "/admin/content", label: "Контент", icon: "FileText", exact: false },
+  { href: "/rt-manage", label: "Обзор", icon: "LayoutDashboard", exact: true },
+  { href: "/rt-manage/reviews", label: "Отзывы", icon: "MessageSquare", exact: false },
+  { href: "/rt-manage/content", label: "Контент", icon: "FileText", exact: false },
 ];
 
 export default function AdminLayout({ children, onLogout }: Props) {
