@@ -28,7 +28,7 @@ function MiniDashboard({ quotes }: { quotes: Quote[] }) {
   // Акции МосБиржи для списка (исключаем IMOEX)
   const moexStocks = quotes.filter(q => q.name !== "IMOEX" && (q as Quote & { source?: string }).source === "moex");
   const list = moexStocks.length > 0 ? moexStocks.slice(0, 4) : quotes.slice(0, 4);
-  const card = { background: "rgba(0,0,0,0.18)", border: "1px solid rgba(255,255,255,0.04)", borderRadius: 14, backdropFilter: "blur(20px)" } as React.CSSProperties;
+  const card = { background: "transparent", border: "none", borderRadius: 14 } as React.CSSProperties;
 
   return (
     <div className="hidden lg:flex flex-col gap-2.5 w-72 xl:w-80 flex-shrink-0">
