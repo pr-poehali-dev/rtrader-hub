@@ -4,6 +4,17 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
+
+import Index from "./pages/Index";
+import Analytics from "./pages/Analytics";
+import Reflections from "./pages/Reflections";
+import ReflectionArticle from "./pages/ReflectionArticle";
+import Tournaments from "./pages/Tournaments";
+import Education from "./pages/Education";
+import Reviews from "./pages/Reviews";
+import Vip from "./pages/Vip";
+import Community from "./pages/Community";
+
 import ClubIndex from "./pages/ClubIndex";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -24,7 +35,7 @@ function Spinner() {
   );
 }
 
-function PrivateRoute({ children }: { children: React.ReactNode }) {
+function ClubRoute({ children }: { children: React.ReactNode }) {
   const { user, loading, hasAccess, subLoading } = useAuth();
   if (loading || subLoading) return <Spinner />;
   if (!user) return <Navigate to="/login" replace />;
@@ -40,10 +51,12 @@ function AdminRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-function PublicRoute({ children }: { children: React.ReactNode }) {
-  const { user, loading } = useAuth();
-  if (loading) return <Spinner />;
-  return user ? <Navigate to="/" replace /> : <>{children}</>;
+function LoginRoute({ children }: { children: React.ReactNode }) {
+  const { user, loading, hasAccess, subLoading } = useAuth();
+  if (loading || subLoading) return <Spinner />;
+  if (!user) return <>{children}</>;
+  if (hasAccess) return <Navigate to="/club" replace />;
+  return <Navigate to="/subscribe" replace />;
 }
 
 function AuthedRoute({ children }: { children: React.ReactNode }) {
@@ -56,13 +69,28 @@ function AuthedRoute({ children }: { children: React.ReactNode }) {
 function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<PrivateRoute><ClubIndex /></PrivateRoute>} />
-      <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
-      <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
-      <Route path="/restore-password" element={<PublicRoute><RestorePassword /></PublicRoute>} />
+      {/* Портал — публичный */}
+      <Route path="/" element={<Index />} />
+      <Route path="/analytics" element={<Analytics />} />
+      <Route path="/reflections" element={<Reflections />} />
+      <Route path="/reflections/:id" element={<ReflectionArticle />} />
+      <Route path="/tournaments" element={<Tournaments />} />
+      <Route path="/education" element={<Education />} />
+      <Route path="/reviews" element={<Reviews />} />
+      <Route path="/vip" element={<Vip />} />
+      <Route path="/community" element={<Community />} />
+
+      {/* VIP-клуб */}
+      <Route path="/club" element={<ClubRoute><ClubIndex /></ClubRoute>} />
+      <Route path="/profile" element={<AuthedRoute><Profile /></AuthedRoute>} />
       <Route path="/subscribe" element={<AuthedRoute><Paywall /></AuthedRoute>} />
       <Route path="/admin" element={<AdminRoute><ClubAdmin /></AdminRoute>} />
-      <Route path="/profile" element={<AuthedRoute><Profile /></AuthedRoute>} />
+
+      {/* Авторизация */}
+      <Route path="/login" element={<LoginRoute><Login /></LoginRoute>} />
+      <Route path="/register" element={<LoginRoute><Register /></LoginRoute>} />
+      <Route path="/restore-password" element={<RestorePassword />} />
+
       <Route path="*" element={<NotFound />} />
     </Routes>
   );

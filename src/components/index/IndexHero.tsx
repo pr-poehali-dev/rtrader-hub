@@ -301,11 +301,11 @@ export default function IndexHero({ scrolled, menuOpen, setMenuOpen, navTo }: In
               <Icon name="Send" size={13} />
               <span className="hidden sm:inline">TG</span>
             </a>
-            <a href={VIP_URL} target="_blank" rel="noopener noreferrer"
+            <Link to={VIP_URL}
               className="neon-btn text-xs px-3 py-1.5 flex items-center gap-1.5 whitespace-nowrap">
               <Icon name="Crown" size={13} />
               <span className="hidden sm:inline">VIP</span>
-            </a>
+            </Link>
             <button className="2xl:hidden p-1.5 text-white/70 hover:text-white ml-1" onClick={() => setMenuOpen(!menuOpen)}>
               <Icon name={menuOpen ? "X" : "Menu"} size={22} />
             </button>
@@ -327,10 +327,10 @@ export default function IndexHero({ scrolled, menuOpen, setMenuOpen, navTo }: In
                 className="flex-1 text-center py-2.5 rounded-xl border border-white/15 text-white/60 text-sm hover:text-white hover:border-white/30 transition-all">
                 Telegram
               </a>
-              <a href={VIP_URL} target="_blank" rel="noopener noreferrer"
+              <Link to={VIP_URL}
                 className="neon-btn flex-1 text-center text-sm py-2.5">
                 VIP-клуб
-              </a>
+              </Link>
             </div>
           </div>
         )}
@@ -383,11 +383,11 @@ export default function IndexHero({ scrolled, menuOpen, setMenuOpen, navTo }: In
                   <Icon name="Users" size={16} />
                   К комьюнити и аналитике
                 </Link>
-                <a href={VIP_URL} target="_blank" rel="noopener noreferrer"
+                <Link to={VIP_URL}
                   className="neon-btn text-sm px-6 py-3 flex items-center gap-2">
                   <Icon name="Crown" size={16} />
                   Войти в VIP-клуб
-                </a>
+                </Link>
                 <Link to="/education"
                   className="text-sm text-white/40 hover:text-white/75 transition-colors underline underline-offset-4 decoration-white/20 hover:decoration-white/50 flex items-center gap-1.5 px-2">
                   Перейти к обучению

@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import Icon from "@/components/ui/icon";
 import { Button } from "@/components/ui/button";
@@ -59,12 +59,17 @@ export default function NoAccess() {
           </div>
         )}
 
-        <button
-          onClick={handleLogout}
-          className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-        >
-          Выйти из аккаунта
-        </button>
+        <div className="flex flex-col items-center gap-2">
+          <Link to="/" className="text-xs text-primary hover:underline">
+            ← Вернуться на портал rtrader11.ru
+          </Link>
+          <button
+            onClick={handleLogout}
+            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Выйти из аккаунта
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 
-export const VIP_URL = "https://web-app-hosting--preview.poehali.dev/login";
+export const VIP_URL = "/club";
 export const TG_URL = "https://t.me/RTrader11";
 
 export const NAV_ITEMS = [
