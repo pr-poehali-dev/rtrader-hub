@@ -1,0 +1,12 @@
+{
+  "tests": [
+    {
+      "name": "GET quotes",
+      "method": "GET",
+      "path": "/",
+      "expectedStatus": 200,
+      "expectedBody": {"quotes": []},
+      "bodyMatcher": "partial"
+    }
+  ]
+}

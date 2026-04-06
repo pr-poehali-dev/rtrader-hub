@@ -2,6 +2,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Icon from "@/components/ui/icon";
 import { getAdminToken } from "@/hooks/useAdminAuth";
+import { useQuotes, type Quote } from "@/hooks/useQuotes";
 import {
   NAV_ITEMS, TICKER_ITEMS, STATS, SECTIONS,
   Reveal, Sparkline, VIP_URL, TG_URL,
@@ -14,29 +15,41 @@ interface IndexHeroProps {
   navTo: (href: string, isRoute?: boolean) => void;
 }
 
-function MiniDashboard() {
-  const MINI_STATS = [
-    { val: "2 500+", icon: "Users", label: "участников", color: "#00E5FF" },
-    { val: "7 лет", icon: "Clock", label: "на рынке", color: "#9B30FF" },
-    { val: "200+", icon: "FileText", label: "материалов", color: "#FFD700" },
-  ];
+const MINI_STATS = [
+  { val: "2 500+", icon: "Users", label: "участников", color: "#00E5FF" },
+  { val: "7 лет", icon: "Clock", label: "на рынке", color: "#9B30FF" },
+  { val: "200+", icon: "FileText", label: "материалов", color: "#FFD700" },
+];
+
+function MiniDashboard({ quotes }: { quotes: Quote[] }) {
+  const main = quotes[0]; // BTC как главный инструмент
+  const list = quotes.slice(0, 4);
 
   return (
     <div className="hidden lg:flex flex-col gap-3 w-72 xl:w-80 flex-shrink-0">
+      {/* Главный инструмент */}
       <div className="glass-card p-4">
         <div className="flex items-center justify-between mb-3">
           <div>
-            <div className="text-xs text-white/40 uppercase tracking-widest font-semibold">RI-6.25</div>
-            <div className="font-russo text-white text-xl">112 450</div>
+            <div className="text-xs text-white/40 uppercase tracking-widest font-semibold">
+              {main ? main.name : "BTC/USD"}
+            </div>
+            <div className="font-russo text-white text-xl">
+              {main ? main.price : "—"}
+            </div>
           </div>
-          <span className="text-green-400 text-sm font-bold">+1.4%</span>
+          {main && (
+            <span className={`text-sm font-bold ${main.up ? "text-green-400" : "text-red-400"}`}>
+              {main.change}
+            </span>
+          )}
         </div>
         <div className="w-full h-14">
           <svg viewBox="0 0 200 48" className="w-full h-full" preserveAspectRatio="none">
             <defs>
               <linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="#9B30FF" stopOpacity="0.4" />
-                <stop offset="100%" stopColor="#9B30FF" stopOpacity="0" />
+                <stop offset="0%" stopColor={main?.up !== false ? "#9B30FF" : "#FF2D78"} stopOpacity="0.4" />
+                <stop offset="100%" stopColor={main?.up !== false ? "#9B30FF" : "#FF2D78"} stopOpacity="0" />
               </linearGradient>
             </defs>
             <polygon
@@ -45,16 +58,19 @@ function MiniDashboard() {
             />
             <polyline
               points="0,36 20,28 40,32 60,20 80,24 100,14 120,16 140,8 160,10 180,4 200,6"
-              fill="none" stroke="#9B30FF" strokeWidth="1.5" strokeLinecap="round"
+              fill="none"
+              stroke={main?.up !== false ? "#9B30FF" : "#FF2D78"}
+              strokeWidth="1.5" strokeLinecap="round"
             />
           </svg>
         </div>
         <div className="flex items-center justify-between mt-1">
-          <span className="text-xs text-white/25">Индекс РТС</span>
-          <span className="text-xs text-white/25">сегодня</span>
+          <span className="text-xs text-white/25">крипто · реальное время</span>
+          <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block animate-pulse" />
         </div>
       </div>
 
+      {/* Статистика */}
       <div className="glass-card p-4 grid grid-cols-3 gap-3">
         {MINI_STATS.map((item) => (
           <div key={item.label} className="flex flex-col items-center gap-1 text-center">
@@ -65,8 +81,17 @@ function MiniDashboard() {
         ))}
       </div>
 
+      {/* Список котировок */}
       <div className="glass-card p-3 space-y-2">
-        {TICKER_ITEMS.slice(0, 4).map((t) => (
+        {list.length > 0 ? list.map((t) => (
+          <div key={t.name} className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-russo text-white/60 w-20 truncate">{t.name}</span>
+              <Sparkline color={t.up ? "#4ade80" : "#f87171"} up={t.up} />
+            </div>
+            <span className={`text-xs font-bold ${t.up ? "text-green-400" : "text-red-400"}`}>{t.change}</span>
+          </div>
+        )) : TICKER_ITEMS.slice(0, 4).map((t) => (
           <div key={t.name} className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="text-xs font-russo text-white/60 w-20">{t.name}</span>
@@ -265,7 +290,9 @@ function SectionCarousel() {
 }
 
 export default function IndexHero({ scrolled, menuOpen, setMenuOpen, navTo }: IndexHeroProps) {
-  const tickerDouble = [...TICKER_ITEMS, ...TICKER_ITEMS];
+  const { data: quotes = [] } = useQuotes();
+  const tickerItems = quotes.length > 0 ? quotes : TICKER_ITEMS;
+  const tickerDouble = [...tickerItems, ...tickerItems];
 
   return (
     <>
@@ -396,7 +423,7 @@ export default function IndexHero({ scrolled, menuOpen, setMenuOpen, navTo }: In
               </div>
             </div>
 
-            <MiniDashboard />
+            <MiniDashboard quotes={quotes} />
           </div>
         </div>
 
