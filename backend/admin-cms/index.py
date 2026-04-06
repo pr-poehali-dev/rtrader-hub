@@ -36,7 +36,9 @@ FIELDS = {
     "tournaments": ["name", "status", "start_date", "end_date", "instrument",
                     "description", "body", "tags", "video_url", "prize", "participants", "winner", "result",
                     "image_url", "is_visible", "sort_order"],
-    "author":      ["heading", "body", "tags"],
+    "author":      ["heading", "body", "tags",
+                    "reflections_cta_eyebrow", "reflections_cta_title",
+                    "reflections_cta_text", "reflections_cta_btn", "reflections_cta_url"],
 }
 
 

@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import Icon from "@/components/ui/icon";
 
-const TG_URL = "https://t.me/RTrader11";
 const API_URL = "https://functions.poehali.dev/1177521b-9812-4631-b339-b216a5d91c4e";
+const AUTHOR_API = "https://functions.poehali.dev/1177521b-9812-4631-b339-b216a5d91c4e";
 
 const TAGS = ["Все", "Психология", "Дисциплина", "Эмоции"];
 const TAG_ACCENTS: Record<string, string> = {
@@ -11,13 +11,22 @@ const TAG_ACCENTS: Record<string, string> = {
 };
 
 interface Article {
-  id: number; title: string; tag: string; read_time: string;
+  id: number; title: string; tag: string; tags: string; read_time: string;
   preview: string; image_url?: string; created_at: string;
 }
+
+interface Cta {
+  eyebrow: string; title: string; text: string; btn: string; url: string;
+}
+
+const DEFAULT_CTA: Cta = {
+  eyebrow: "", title: "", text: "", btn: "", url: "",
+};
 
 export default function Reflections() {
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
+  const [cta, setCta] = useState<Cta>(DEFAULT_CTA);
   const [searchParams] = useSearchParams();
   const urlTag = searchParams.get("tag");
   const [activeTag, setActiveTag] = useState(urlTag && TAGS.includes(urlTag) ? urlTag : "Все");
@@ -27,6 +36,21 @@ export default function Reflections() {
       .then(r => r.json())
       .then(d => { setArticles(d.items || []); setLoading(false); })
       .catch(() => setLoading(false));
+
+    fetch(`${AUTHOR_API}?section=author`)
+      .then(r => r.json())
+      .then(d => {
+        if (d.item) {
+          setCta({
+            eyebrow: d.item.reflections_cta_eyebrow || "",
+            title:   d.item.reflections_cta_title   || "",
+            text:    d.item.reflections_cta_text     || "",
+            btn:     d.item.reflections_cta_btn      || "",
+            url:     d.item.reflections_cta_url      || "",
+          });
+        }
+      })
+      .catch(() => {});
   }, []);
 
   const filtered = activeTag === "Все"
@@ -135,14 +159,29 @@ export default function Reflections() {
           </div>
         )}
 
-        <div className="glass-card p-8 text-center">
-          <div className="text-xs text-white/30 uppercase tracking-widest mb-2">Больше материалов</div>
-          <h2 className="font-russo text-xl text-white mb-3">Подпишись на Telegram</h2>
-          <p className="text-white/45 text-sm mb-6 max-w-md mx-auto">Новые статьи о психологии и дисциплине — в Telegram-канале RTrader.</p>
-          <a href={TG_URL} target="_blank" rel="noopener noreferrer" className="neon-btn px-6 py-2.5 text-sm inline-flex items-center gap-2">
-            <Icon name="Send" size={14} /> Перейти в Telegram
-          </a>
-        </div>
+        {(cta.title || cta.btn) && (
+          <div className="glass-card px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6">
+            <div className="flex-1 min-w-0">
+              {cta.eyebrow && (
+                <div className="text-xs text-white/30 uppercase tracking-widest mb-0.5">{cta.eyebrow}</div>
+              )}
+              {cta.title && (
+                <div className="font-russo text-base text-white leading-tight">{cta.title}</div>
+              )}
+              {cta.text && (
+                <p className="text-white/45 text-xs mt-1 leading-relaxed">{cta.text}</p>
+              )}
+            </div>
+            {cta.btn && cta.url && (
+              <a href={cta.url}
+                target={cta.url.startsWith("http") ? "_blank" : undefined}
+                rel={cta.url.startsWith("http") ? "noopener noreferrer" : undefined}
+                className="neon-btn text-xs px-5 py-2 whitespace-nowrap flex-shrink-0 inline-flex items-center gap-1.5">
+                {cta.btn}
+              </a>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
