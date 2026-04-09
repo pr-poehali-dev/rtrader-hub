@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Icon from "@/components/ui/icon";
 import HubNav from "@/components/HubNav";
 import { RenderText } from "@/lib/renderText";
+import MediaGallery from "@/components/MediaGallery";
 
 const TG_URL = "https://t.me/RTrader11";
 const VIP_URL = "/vip";
@@ -12,11 +13,12 @@ const RISK_COLORS: Record<string, string> = {
   низкий: "#22c55e", средний: "#FFD700", высокий: "#ff4444",
 };
 
+interface MediaItem { type: "image" | "audio" | "video" | "link"; url: string; label?: string; }
 interface Item {
   id: number; type: string; instrument: string; title: string; category: string;
   direction: string; entry: string; target: string; stop: string; risk: string;
   description: string; body: string; tags: string; video_url: string;
-  image_url: string; created_at: string;
+  image_url: string; media_items: MediaItem[]; created_at: string;
 }
 
 // OLD NAV — оставлен для отката:
@@ -164,6 +166,11 @@ export default function Analytics() {
                       <div className="mb-4 pt-3 border-t border-white/8">
                         <RenderText text={item.body} accent="#FFD700" className="text-white/60 text-sm" />
                       </div>
+                    )}
+
+                    {/* Медиа */}
+                    {isOpen && item.media_items && item.media_items.length > 0 && (
+                      <MediaGallery items={item.media_items} />
                     )}
 
                     {/* Футер */}

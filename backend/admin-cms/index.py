@@ -26,15 +26,15 @@ SCHEMA = "t_p67093308_rtrader_hub"
 ALLOWED_SECTIONS = {"reflections", "analytics", "education", "tournaments", "author"}
 
 FIELDS = {
-    "reflections": ["title", "tag", "tags", "read_time", "preview", "body", "image_url", "is_visible", "sort_order"],
+    "reflections": ["title", "tag", "tags", "read_time", "preview", "body", "image_url", "media_items", "is_visible", "sort_order"],
     "analytics":   ["type", "instrument", "title", "category", "direction", "entry", "target",
                     "stop", "risk", "description", "body", "tags", "video_url",
-                    "image_url", "is_visible", "sort_order"],
+                    "image_url", "media_items", "is_visible", "sort_order"],
     "education":   ["number", "title", "description", "body", "lessons", "duration", "level",
-                    "topics", "tags", "video_url", "image_url", "is_free", "is_visible", "sort_order"],
+                    "topics", "tags", "video_url", "image_url", "media_items", "is_free", "is_visible", "sort_order"],
     "tournaments": ["name", "status", "start_date", "end_date", "instrument",
                     "description", "body", "tags", "video_url", "prize", "participants", "winner", "result",
-                    "image_url", "is_visible", "sort_order"],
+                    "image_url", "media_items", "is_visible", "sort_order"],
     "author":      ["heading", "body", "tags",
                     "reflections_cta_eyebrow", "reflections_cta_title",
                     "reflections_cta_text", "reflections_cta_btn", "reflections_cta_url"],
@@ -142,6 +142,8 @@ def handler(event: dict, context) -> dict:
         if not data:
             c.close()
             return err(400, "No fields provided")
+        if "media_items" in data and isinstance(data["media_items"], (list, dict)):
+            data["media_items"] = json.dumps(data["media_items"], ensure_ascii=False)
         cols = ", ".join(data.keys())
         placeholders = ", ".join(["%s"] * len(data))
         vals = list(data.values())
@@ -186,6 +188,8 @@ def handler(event: dict, context) -> dict:
         if not data:
             c.close()
             return err(400, "No fields provided")
+        if "media_items" in data and isinstance(data["media_items"], (list, dict)):
+            data["media_items"] = json.dumps(data["media_items"], ensure_ascii=False)
         sets = ", ".join(f"{k}=%s" for k in data)
         cur = c.cursor()
         cur.execute(f"UPDATE {SCHEMA}.{section} SET {sets} WHERE id=%s",

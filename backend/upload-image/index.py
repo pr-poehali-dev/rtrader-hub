@@ -1,7 +1,8 @@
 """
-Загрузка изображения в S3. Принимает base64 или multipart.
+Загрузка медиафайлов в S3: изображения, аудио, видео.
 POST / — { "image": "<base64>", "filename": "photo.jpg" }
 Требует заголовок X-Admin-Token.
+Лимиты: изображения до 10 МБ, аудио до 20 МБ, видео до 50 МБ.
 """
 
 import json
@@ -19,6 +20,25 @@ CORS_HEADERS = {
 }
 
 SCHEMA = "t_p67093308_rtrader_hub"
+
+IMAGE_EXTS = {"jpg", "jpeg", "png", "gif", "webp"}
+AUDIO_EXTS = {"mp3", "ogg", "wav", "m4a", "aac"}
+VIDEO_EXTS = {"mp4", "webm", "mov", "avi"}
+
+CONTENT_TYPE_MAP = {
+    "jpg": "image/jpeg", "jpeg": "image/jpeg", "png": "image/png",
+    "gif": "image/gif", "webp": "image/webp",
+    "mp3": "audio/mpeg", "ogg": "audio/ogg", "wav": "audio/wav",
+    "m4a": "audio/mp4", "aac": "audio/aac",
+    "mp4": "video/mp4", "webm": "video/webm",
+    "mov": "video/quicktime", "avi": "video/x-msvideo",
+}
+
+SIZE_LIMITS = {
+    "image": 10 * 1024 * 1024,
+    "audio": 20 * 1024 * 1024,
+    "video": 50 * 1024 * 1024,
+}
 
 
 def get_db():
@@ -61,35 +81,54 @@ def handler(event: dict, context) -> dict:
         }
 
     body = json.loads(event.get("body") or "{}")
-    image_b64 = body.get("image", "")
-    filename = body.get("filename", "image.jpg")
+    file_b64 = body.get("image", "") or body.get("file", "")
+    filename = body.get("filename", "file.jpg")
 
-    if not image_b64:
+    if not file_b64:
         return {
             "statusCode": 400,
             "headers": {**CORS_HEADERS, "Content-Type": "application/json"},
-            "body": json.dumps({"error": "image (base64) required"}),
+            "body": json.dumps({"error": "file (base64) required"}),
         }
 
-    # Убираем data:image/jpeg;base64, префикс если есть
-    if "," in image_b64:
-        image_b64 = image_b64.split(",", 1)[1]
+    if "," in file_b64:
+        file_b64 = file_b64.split(",", 1)[1]
 
-    image_data = base64.b64decode(image_b64)
+    file_data = base64.b64decode(file_b64)
 
     ext = filename.rsplit(".", 1)[-1].lower() if "." in filename else "jpg"
-    ext = ext if ext in ("jpg", "jpeg", "png", "gif", "webp") else "jpg"
-    content_type_map = {"jpg": "image/jpeg", "jpeg": "image/jpeg",
-                        "png": "image/png", "gif": "image/gif", "webp": "image/webp"}
-    content_type = content_type_map.get(ext, "image/jpeg")
 
-    key = f"cms/{uuid.uuid4().hex}.{ext}"
+    if ext in IMAGE_EXTS:
+        media_type = "image"
+        folder = "cms"
+    elif ext in AUDIO_EXTS:
+        media_type = "audio"
+        folder = "cms/audio"
+    elif ext in VIDEO_EXTS:
+        media_type = "video"
+        folder = "cms/video"
+    else:
+        ext = "jpg"
+        media_type = "image"
+        folder = "cms"
+
+    size_limit = SIZE_LIMITS[media_type]
+    if len(file_data) > size_limit:
+        limit_mb = size_limit // (1024 * 1024)
+        return {
+            "statusCode": 400,
+            "headers": {**CORS_HEADERS, "Content-Type": "application/json"},
+            "body": json.dumps({"error": f"Файл слишком большой. Максимум {limit_mb} МБ для {media_type}"}),
+        }
+
+    content_type = CONTENT_TYPE_MAP.get(ext, "application/octet-stream")
+    key = f"{folder}/{uuid.uuid4().hex}.{ext}"
 
     s3 = get_s3()
     s3.put_object(
         Bucket="files",
         Key=key,
-        Body=image_data,
+        Body=file_data,
         ContentType=content_type,
     )
 
@@ -99,5 +138,5 @@ def handler(event: dict, context) -> dict:
     return {
         "statusCode": 200,
         "headers": {**CORS_HEADERS, "Content-Type": "application/json"},
-        "body": json.dumps({"ok": True, "url": cdn_url}),
+        "body": json.dumps({"ok": True, "url": cdn_url, "type": media_type}),
     }

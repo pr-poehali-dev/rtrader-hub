@@ -3,6 +3,7 @@ import { Link, useParams, useNavigate } from "react-router-dom";
 import Icon from "@/components/ui/icon";
 import { RenderText } from "@/lib/renderText";
 import HubNav from "@/components/HubNav";
+import MediaGallery from "@/components/MediaGallery";
 
 const API_URL = "https://functions.poehali.dev/1177521b-9812-4631-b339-b216a5d91c4e";
 const TG_URL = "https://t.me/RTrader11";
@@ -11,9 +12,10 @@ const TAG_ACCENTS: Record<string, string> = {
   Психология: "#9B30FF", Дисциплина: "#FFD700", Эмоции: "#FF2D78",
 };
 
+interface MediaItem { type: "image" | "audio" | "video" | "link"; url: string; label?: string; }
 interface Article {
   id: number; title: string; tag: string; tags: string; read_time: string;
-  preview: string; body: string; image_url?: string; created_at: string;
+  preview: string; body: string; image_url?: string; media_items?: MediaItem[]; created_at: string;
 }
 
 export default function ReflectionArticle() {
@@ -101,6 +103,13 @@ export default function ReflectionArticle() {
           accent={accent}
           className="text-white/65 text-base"
         />
+
+        {/* Медиа-материалы */}
+        {article.media_items && article.media_items.length > 0 && (
+          <div className="mt-8">
+            <MediaGallery items={article.media_items} />
+          </div>
+        )}
 
         {/* Навигация */}
         <div className="mt-12 pt-8 border-t border-white/8 flex items-center justify-between">

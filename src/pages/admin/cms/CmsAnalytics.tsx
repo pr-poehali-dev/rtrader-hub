@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Icon from "@/components/ui/icon";
 import { cmsGet, cmsCreate, cmsUpdate, cmsToggleVisible, cmsDelete } from "@/lib/adminCms";
 import ImageUpload from "@/components/admin/ImageUpload";
+import MediaUpload from "@/components/admin/MediaUpload";
 import TagSelect from "@/components/admin/TagSelect";
 
 const SECTION = "analytics";
@@ -9,23 +10,25 @@ const CATS = ["Акции РФ", "Нефть и газ", "Металлы", "Ва
 const RISKS = ["низкий", "средний", "высокий"];
 const TAGS_LIST = ["Акции", "Фьючерсы", "Валюта", "Крипто", "Обзор рынка", "Сделка дня"];
 
+interface MediaItem { type: "image" | "audio" | "video" | "link"; url: string; label?: string; }
+
 interface Item {
   id: number; type: string; instrument: string; title: string; category: string;
   direction: string; entry: string; target: string; stop: string; risk: string;
   description: string; body: string; tags: string; video_url: string;
-  image_url: string; is_visible: boolean; sort_order: number;
+  image_url: string; media_items: MediaItem[]; is_visible: boolean; sort_order: number;
 }
 
 const emptySignal = (): Omit<Item, "id"> => ({
   type: "signal", instrument: "", title: "", category: "Акции РФ",
   direction: "long", entry: "", target: "", stop: "", risk: "средний",
-  description: "", body: "", tags: "", video_url: "", image_url: "", is_visible: true, sort_order: 0,
+  description: "", body: "", tags: "", video_url: "", image_url: "", media_items: [], is_visible: true, sort_order: 0,
 });
 
 const emptyReview = (): Omit<Item, "id"> => ({
   type: "review", instrument: "", title: "", category: "Акции РФ",
   direction: "long", entry: "", target: "", stop: "", risk: "средний",
-  description: "", body: "", tags: "", video_url: "", image_url: "", is_visible: true, sort_order: 0,
+  description: "", body: "", tags: "", video_url: "", image_url: "", media_items: [], is_visible: true, sort_order: 0,
 });
 
 export default function CmsAnalytics() {
@@ -57,7 +60,9 @@ export default function CmsAnalytics() {
       target: item.target, stop: item.stop, risk: item.risk,
       description: item.description, body: item.body || "",
       tags: item.tags || "", video_url: item.video_url || "",
-      image_url: item.image_url || "", is_visible: item.is_visible, sort_order: item.sort_order,
+      image_url: item.image_url || "",
+      media_items: Array.isArray(item.media_items) ? item.media_items : [],
+      is_visible: item.is_visible, sort_order: item.sort_order,
     });
     setEditing(item); setIsNew(false); window.scrollTo(0, 0);
   };
@@ -233,6 +238,13 @@ export default function CmsAnalytics() {
                 {currentType === "signal" ? "График / скриншот" : "Обложка / иллюстрация"}
               </label>
               <ImageUpload value={form.image_url} onChange={v => f("image_url", v)} />
+            </div>
+
+            {/* Медиа-материалы */}
+            <div>
+              <label className="text-xs text-white/40 mb-2 block">Медиа-материалы</label>
+              <p className="text-xs text-white/25 mb-2">Добавьте фото, аудио, видео или ссылки к материалу</p>
+              <MediaUpload value={form.media_items} onChange={v => f("media_items", v)} />
             </div>
 
             <div className="flex items-center gap-3 pt-2 border-t border-white/8">

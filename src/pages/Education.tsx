@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Icon from "@/components/ui/icon";
 import { RenderText } from "@/lib/renderText";
 import HubNav from "@/components/HubNav";
+import MediaGallery from "@/components/MediaGallery";
 
 const TG_URL = "https://t.me/RTrader11";
 const VIP_URL = "/vip";
@@ -12,11 +13,12 @@ const LEVEL_COLORS: Record<string, string> = {
   Начинающий: "#22c55e", Средний: "#FFD700", Продвинутый: "#9B30FF", Любой: "#38BDF8",
 };
 
+interface MediaItem { type: "image" | "audio" | "video" | "link"; url: string; label?: string; }
 interface Item {
   id: number; number: string; title: string; description: string;
   body: string; lessons: number; duration: string; level: string;
   topics: string; tags: string; video_url: string; image_url: string;
-  is_free: boolean; created_at: string;
+  media_items: MediaItem[]; is_free: boolean; created_at: string;
 }
 
 export default function Education() {
@@ -139,6 +141,11 @@ export default function Education() {
                           <RenderText text={item.body} accent={accent} className="text-white/60 text-sm" />
                         )}
                       </div>
+                    )}
+
+                    {/* Медиа */}
+                    {isOpen && item.media_items && item.media_items.length > 0 && (
+                      <MediaGallery items={item.media_items} />
                     )}
 
                     {/* Футер */}

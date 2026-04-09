@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Icon from "@/components/ui/icon";
 import { RenderText } from "@/lib/renderText";
 import HubNav from "@/components/HubNav";
+import MediaGallery from "@/components/MediaGallery";
 
 const API_URL = "https://functions.poehali.dev/1177521b-9812-4631-b339-b216a5d91c4e";
 
@@ -12,11 +13,12 @@ const STATUS_META: Record<string, { label: string; color: string }> = {
   finished: { label: "Завершён",     color: "#9ca3af" },
 };
 
+interface MediaItem { type: "image" | "audio" | "video" | "link"; url: string; label?: string; }
 interface Item {
   id: number; name: string; status: string; start_date: string; end_date: string;
   instrument: string; description: string; body: string; tags: string;
   video_url: string; prize: string; participants: number; winner: string;
-  result: string; image_url: string; created_at: string;
+  result: string; image_url: string; media_items: MediaItem[]; created_at: string;
 }
 
 export default function Tournaments() {
@@ -174,6 +176,11 @@ export default function Tournaments() {
                           <RenderText text={item.body} accent="#FFD700" className="text-white/60 text-sm" />
                         )}
                       </div>
+                    )}
+
+                    {/* Медиа */}
+                    {isOpen && item.media_items && item.media_items.length > 0 && (
+                      <MediaGallery items={item.media_items} />
                     )}
 
                     {/* Футер */}

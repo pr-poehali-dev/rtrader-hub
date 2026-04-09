@@ -2,19 +2,22 @@ import { useState, useEffect } from "react";
 import Icon from "@/components/ui/icon";
 import { cmsGet, cmsCreate, cmsUpdate, cmsToggleVisible, cmsDelete } from "@/lib/adminCms";
 import ImageUpload from "@/components/admin/ImageUpload";
+import MediaUpload from "@/components/admin/MediaUpload";
 import TagSelect from "@/components/admin/TagSelect";
 
 const SECTION = "reflections";
 const TAGS = ["Психология", "Дисциплина", "Эмоции"];
 
+interface MediaItem { type: "image" | "audio" | "video" | "link"; url: string; label?: string; }
+
 interface Item {
   id: number; title: string; tag: string; tags: string; read_time: string;
-  preview: string; body: string; image_url: string; is_visible: boolean; sort_order: number;
+  preview: string; body: string; image_url: string; media_items: MediaItem[]; is_visible: boolean; sort_order: number;
 }
 
 const empty = (): Omit<Item, "id"> => ({
   title: "", tag: "Психология", tags: "", read_time: "5 мин",
-  preview: "", body: "", image_url: "", is_visible: true, sort_order: 0,
+  preview: "", body: "", image_url: "", media_items: [], is_visible: true, sort_order: 0,
 });
 
 function Tooltip({ text, children }: { text: string; children: React.ReactNode }) {
@@ -49,7 +52,9 @@ export default function CmsReflections() {
     setForm({
       title: item.title, tag: item.tag, tags: item.tags || "",
       read_time: item.read_time, preview: item.preview, body: item.body || "",
-      image_url: item.image_url || "", is_visible: item.is_visible, sort_order: item.sort_order,
+      image_url: item.image_url || "",
+      media_items: Array.isArray(item.media_items) ? item.media_items : [],
+      is_visible: item.is_visible, sort_order: item.sort_order,
     });
     setEditing(item); setIsNew(false); window.scrollTo(0, 0);
   };
@@ -161,6 +166,13 @@ export default function CmsReflections() {
                 Изображение-обложка
               </label>
               <ImageUpload value={form.image_url} onChange={v => f("image_url", v)} />
+            </div>
+
+            {/* Медиа-материалы */}
+            <div>
+              <label className="text-xs text-white/40 mb-2 block">Медиа-материалы</label>
+              <p className="text-xs text-white/25 mb-2">Добавьте фото, аудио, видео или ссылки к рефлексии</p>
+              <MediaUpload value={form.media_items} onChange={v => f("media_items", v)} />
             </div>
 
             <div className="flex items-center gap-3 pt-2 border-t border-white/8">

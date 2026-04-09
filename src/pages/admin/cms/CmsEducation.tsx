@@ -2,24 +2,27 @@ import { useState, useEffect } from "react";
 import Icon from "@/components/ui/icon";
 import { cmsGet, cmsCreate, cmsUpdate, cmsToggleVisible, cmsDelete } from "@/lib/adminCms";
 import ImageUpload from "@/components/admin/ImageUpload";
+import MediaUpload from "@/components/admin/MediaUpload";
 import TagSelect from "@/components/admin/TagSelect";
 
 const SECTION = "education";
 const LEVELS = ["Начинающий", "Средний", "Продвинутый", "Любой"];
 const TAGS_LIST = ["Психология", "Технический анализ", "Риск-менеджмент", "Фундаментал", "Стратегия", "Инструменты"];
 
+interface MediaItem { type: "image" | "audio" | "video" | "link"; url: string; label?: string; }
+
 interface Item {
   id: number; number: string; title: string; description: string;
   body: string; lessons: number; duration: string; level: string;
   topics: string; tags: string; video_url: string; image_url: string;
-  is_free: boolean; is_visible: boolean; sort_order: number;
+  media_items: MediaItem[]; is_free: boolean; is_visible: boolean; sort_order: number;
 }
 
 const empty = (): Omit<Item, "id"> => ({
   number: "", title: "", description: "", body: "",
   lessons: 0, duration: "", level: "Начинающий",
   topics: "", tags: "", video_url: "", image_url: "",
-  is_free: false, is_visible: true, sort_order: 0,
+  media_items: [], is_free: false, is_visible: true, sort_order: 0,
 });
 
 export default function CmsEducation() {
@@ -45,6 +48,7 @@ export default function CmsEducation() {
       body: item.body || "", lessons: item.lessons, duration: item.duration,
       level: item.level, topics: item.topics, tags: item.tags || "",
       video_url: item.video_url || "", image_url: item.image_url || "",
+      media_items: Array.isArray(item.media_items) ? item.media_items : [],
       is_free: item.is_free, is_visible: item.is_visible, sort_order: item.sort_order,
     });
     setEditing(item); setIsNew(false); window.scrollTo(0, 0);
@@ -181,6 +185,13 @@ export default function CmsEducation() {
             <div>
               <label className="text-xs text-white/40 mb-2 block">Обложка материала</label>
               <ImageUpload value={form.image_url} onChange={v => f("image_url", v)} />
+            </div>
+
+            {/* Медиа-материалы */}
+            <div>
+              <label className="text-xs text-white/40 mb-2 block">Медиа-материалы</label>
+              <p className="text-xs text-white/25 mb-2">Добавьте фото, аудио, видео или ссылки к уроку</p>
+              <MediaUpload value={form.media_items} onChange={v => f("media_items", v)} />
             </div>
 
             {/* Чекбокс бесплатно */}

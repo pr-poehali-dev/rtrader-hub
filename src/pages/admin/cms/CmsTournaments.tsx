@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Icon from "@/components/ui/icon";
 import { cmsGet, cmsCreate, cmsUpdate, cmsToggleVisible, cmsDelete } from "@/lib/adminCms";
 import ImageUpload from "@/components/admin/ImageUpload";
+import MediaUpload from "@/components/admin/MediaUpload";
 import TagSelect from "@/components/admin/TagSelect";
 
 const SECTION = "tournaments";
@@ -12,18 +13,20 @@ const STATUSES = [
 ];
 const TAGS_LIST = ["Акции", "Фьючерсы", "Форекс", "Крипто", "Индексы"];
 
+interface MediaItem { type: "image" | "audio" | "video" | "link"; url: string; label?: string; }
+
 interface Item {
   id: number; name: string; status: string; start_date: string; end_date: string;
   instrument: string; description: string; body: string; tags: string;
   video_url: string; prize: string; participants: number; winner: string;
-  result: string; image_url: string; is_visible: boolean; sort_order: number;
+  result: string; image_url: string; media_items: MediaItem[]; is_visible: boolean; sort_order: number;
 }
 
 const empty = (): Omit<Item, "id"> => ({
   name: "", status: "upcoming", start_date: "", end_date: "",
   instrument: "", description: "", body: "", tags: "",
   video_url: "", prize: "", participants: 0, winner: "", result: "",
-  image_url: "", is_visible: true, sort_order: 0,
+  image_url: "", media_items: [], is_visible: true, sort_order: 0,
 });
 
 export default function CmsTournaments() {
@@ -51,7 +54,9 @@ export default function CmsTournaments() {
       tags: item.tags || "", video_url: item.video_url || "",
       prize: item.prize || "", participants: item.participants || 0,
       winner: item.winner || "", result: item.result || "",
-      image_url: item.image_url || "", is_visible: item.is_visible, sort_order: item.sort_order,
+      image_url: item.image_url || "",
+      media_items: Array.isArray(item.media_items) ? item.media_items : [],
+      is_visible: item.is_visible, sort_order: item.sort_order,
     });
     setEditing(item); setIsNew(false); window.scrollTo(0, 0);
   };
@@ -216,6 +221,13 @@ export default function CmsTournaments() {
             <div>
               <label className="text-xs text-white/40 mb-2 block">Обложка конкурса</label>
               <ImageUpload value={form.image_url} onChange={v => f("image_url", v)} />
+            </div>
+
+            {/* Медиа-материалы */}
+            <div>
+              <label className="text-xs text-white/40 mb-2 block">Медиа-материалы</label>
+              <p className="text-xs text-white/25 mb-2">Добавьте фото, аудио, видео или ссылки к конкурсу</p>
+              <MediaUpload value={form.media_items} onChange={v => f("media_items", v)} />
             </div>
 
             <div className="flex items-center gap-3 pt-2 border-t border-white/8">

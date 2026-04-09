@@ -1,0 +1,67 @@
+interface MediaItem {
+  type: "image" | "audio" | "video" | "link";
+  url: string;
+  label?: string;
+}
+
+interface Props {
+  items: MediaItem[];
+}
+
+export default function MediaGallery({ items }: Props) {
+  if (!items || items.length === 0) return null;
+
+  const images = items.filter(i => i.type === "image");
+  const audios = items.filter(i => i.type === "audio");
+  const videos = items.filter(i => i.type === "video");
+  const links = items.filter(i => i.type === "link");
+
+  return (
+    <div className="flex flex-col gap-3 mt-3">
+      {images.length > 0 && (
+        <div className={`grid gap-2 ${images.length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
+          {images.map((item, i) => (
+            <a key={i} href={item.url} target="_blank" rel="noopener noreferrer"
+              className="block rounded-xl overflow-hidden border border-white/10 hover:border-white/25 transition-colors">
+              <img src={item.url} alt={item.label || ""} className="w-full object-cover max-h-60" />
+            </a>
+          ))}
+        </div>
+      )}
+
+      {audios.map((item, i) => (
+        <div key={i} className="bg-white/5 rounded-xl p-3 border border-white/10">
+          {item.label && <p className="text-xs text-white/40 mb-2">{item.label}</p>}
+          <audio controls className="w-full h-9">
+            <source src={item.url} />
+          </audio>
+        </div>
+      ))}
+
+      {videos.map((item, i) => (
+        <div key={i} className="rounded-xl overflow-hidden border border-white/10 bg-black/30">
+          {item.label && <p className="text-xs text-white/40 px-3 pt-2">{item.label}</p>}
+          <video controls className="w-full max-h-72">
+            <source src={item.url} />
+          </video>
+        </div>
+      ))}
+
+      {links.length > 0 && (
+        <div className="flex flex-col gap-1.5">
+          {links.map((item, i) => (
+            <a key={i} href={item.url} target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-2 text-sm text-[#FFD700]/70 hover:text-[#FFD700] transition-colors group">
+              <span className="w-4 h-4 rounded-full bg-[#FFD700]/10 flex items-center justify-center shrink-0 group-hover:bg-[#FFD700]/20 transition-colors">
+                <svg width="8" height="8" viewBox="0 0 10 10" fill="none">
+                  <path d="M1 9L9 1M9 1H3M9 1V7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                </svg>
+              </span>
+              <span className="truncate">{item.label || item.url}</span>
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
