@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import Icon from "@/components/ui/icon";
+import HubNav from "@/components/HubNav";
 import { vipData } from "@/data/vip";
 import { useState } from "react";
 
@@ -10,26 +11,10 @@ export default function Vip() {
 
   return (
     <div className="neon-grid-bg min-h-screen text-white font-montserrat">
-      {/* NAV */}
-      <nav className="fixed top-0 inset-x-0 z-50 bg-black/70 backdrop-blur-xl border-b border-white/10">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-lg brand-gradient-bg flex items-center justify-center shadow-lg">
-              <span className="font-russo text-black text-sm font-black">RT</span>
-            </div>
-            <span className="font-russo text-xl tracking-wider">
-              R<span className="brand-gradient">TRADER</span>
-            </span>
-          </Link>
-          <div className="flex items-center gap-3">
-            <Link to="/" className="text-white/50 hover:text-white text-sm transition-colors flex items-center gap-1.5">
-              <Icon name="ArrowLeft" size={14} /> На главную
-            </Link>
-          </div>
-        </div>
-      </nav>
+      {/* OLD NAV — для отката раскомментируй и убери HubNav */}
+      <HubNav />
 
-      <div className="pt-24 pb-16 container mx-auto px-4 max-w-5xl">
+      <div className="pt-11 pb-16 container mx-auto px-4 max-w-5xl">
         {/* Hero */}
         <div className="text-center mb-14">
           <div

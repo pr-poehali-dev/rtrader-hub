@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Icon from "@/components/ui/icon";
+import HubNav from "@/components/HubNav";
 import { RenderText } from "@/lib/renderText";
 
 const TG_URL = "https://t.me/RTrader11";
@@ -18,24 +19,8 @@ interface Item {
   image_url: string; created_at: string;
 }
 
-const NAV = (
-  <nav className="fixed top-0 inset-x-0 z-50 bg-black/70 backdrop-blur-xl border-b border-white/10">
-    <div className="max-w-screen-xl mx-auto px-4 py-3 flex items-center justify-between">
-      <Link to="/" className="flex items-center gap-2">
-        <div className="w-8 h-8 rounded-lg brand-gradient-bg flex items-center justify-center shadow-lg">
-          <span className="font-russo text-black text-xs font-black">RT</span>
-        </div>
-        <span className="font-russo text-lg tracking-wider hidden sm:block">R<span className="brand-gradient">TRADER</span></span>
-      </Link>
-      <div className="flex items-center gap-3">
-        <Link to="/" className="text-white/50 hover:text-white text-sm transition-colors flex items-center gap-1.5">
-          <Icon name="ArrowLeft" size={14} /> <span className="hidden sm:inline">На главную</span>
-        </Link>
-        <a href={TG_URL} target="_blank" rel="noopener noreferrer" className="neon-btn text-xs px-3 py-1.5">TG</a>
-      </div>
-    </div>
-  </nav>
-);
+// OLD NAV — оставлен для отката:
+// const NAV = (<nav className="fixed top-0 inset-x-0 z-50 bg-black/70 ...">...</nav>);
 
 export default function Analytics() {
   const [items, setItems] = useState<Item[]>([]);
@@ -58,9 +43,9 @@ export default function Analytics() {
 
   return (
     <div className="neon-grid-bg min-h-screen text-white font-montserrat">
-      {NAV}
+      <HubNav />
 
-      <div className="pt-20 pb-16 container mx-auto px-4 max-w-5xl">
+      <div className="pt-11 pb-16 container mx-auto px-4 max-w-5xl">
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#FFD700] to-[#FF8C00] flex items-center justify-center shadow-lg flex-shrink-0">

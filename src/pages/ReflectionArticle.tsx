@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import Icon from "@/components/ui/icon";
 import { RenderText } from "@/lib/renderText";
+import HubNav from "@/components/HubNav";
 
 const API_URL = "https://functions.poehali.dev/1177521b-9812-4631-b339-b216a5d91c4e";
 const TG_URL = "https://t.me/RTrader11";
@@ -58,24 +59,10 @@ export default function ReflectionArticle() {
 
   return (
     <div className="neon-grid-bg min-h-screen text-white font-montserrat">
-      <nav className="fixed top-0 inset-x-0 z-50 bg-black/70 backdrop-blur-xl border-b border-white/10">
-        <div className="max-w-screen-xl mx-auto px-4 py-3 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg brand-gradient-bg flex items-center justify-center shadow-lg">
-              <span className="font-russo text-black text-xs font-black">RT</span>
-            </div>
-            <span className="font-russo text-lg tracking-wider hidden sm:block">R<span className="brand-gradient">TRADER</span></span>
-          </Link>
-          <div className="flex items-center gap-3">
-            <Link to="/reflections" className="text-white/50 hover:text-white text-sm transition-colors flex items-center gap-1.5">
-              <Icon name="ArrowLeft" size={14} /> <span className="hidden sm:inline">Рефлексии</span>
-            </Link>
-            <a href={TG_URL} target="_blank" rel="noopener noreferrer" className="neon-btn text-xs px-3 py-1.5">TG</a>
-          </div>
-        </div>
-      </nav>
+      {/* OLD NAV — для отката раскомментируй и убери HubNav */}
+      <HubNav />
 
-      <div className="pt-20 pb-20 container mx-auto px-4 max-w-2xl">
+      <div className="pt-11 pb-20 container mx-auto px-4 max-w-2xl">
         {/* Обложка — object-contain чтобы не обрезать */}
         {article.image_url && (
           <div className="w-full rounded-2xl overflow-hidden mb-8 border border-white/10 bg-white/3 flex items-center justify-center">

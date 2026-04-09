@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import Icon from "@/components/ui/icon";
+import HubNav from "@/components/HubNav";
 import ChannelList from "@/components/chat/ChannelList";
 import MessageList from "@/components/chat/MessageList";
 import MessageInput from "@/components/chat/MessageInput";
@@ -30,8 +31,9 @@ export default function Community() {
 
   return (
     <div className="h-screen flex flex-col bg-[hsl(var(--background))] text-white overflow-hidden">
-      {/* Top bar */}
-      <header className="h-14 shrink-0 flex items-center gap-3 px-4 border-b border-white/5 bg-black/30 backdrop-blur-sm">
+      <HubNav />
+      {/* OLD Top bar — для отката раскомментируй и убери HubNav */}
+      <header className="mt-11 h-10 shrink-0 flex items-center gap-3 px-4 border-b border-white/5 bg-black/30 backdrop-blur-sm">
         <Link to="/" className="flex items-center gap-2 text-white/60 hover:text-white transition-colors">
           <Icon name="ArrowLeft" size={16} />
           <span className="text-sm hidden sm:block">На главную</span>
