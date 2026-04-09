@@ -16,7 +16,7 @@ export default function HubNav() {
 
   return (
     <div className="fixed top-0 inset-x-0 z-50 bg-black/80 backdrop-blur-xl border-b border-white/10">
-      <div className="max-w-screen-xl mx-auto px-4 h-11 flex items-center justify-between gap-2">
+      <div className="max-w-screen-xl mx-auto px-4 h-12 flex items-center justify-between gap-2">
 
         {/* Логотип */}
         <Link to="/" className="flex items-center gap-2 flex-shrink-0 group">
@@ -36,7 +36,7 @@ export default function HubNav() {
               <Link
                 key={s.href}
                 to={s.href}
-                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-medium whitespace-nowrap transition-all duration-200 flex-shrink-0"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all duration-200 flex-shrink-0"
                 style={{
                   color: active ? s.accent : "rgba(255,255,255,0.5)",
                   background: active ? `${s.accent}18` : "transparent",
@@ -58,21 +58,32 @@ export default function HubNav() {
                   }
                 }}
               >
-                <Icon name={s.icon as Parameters<typeof Icon>[0]["name"]} size={11} />
+                <Icon name={s.icon as Parameters<typeof Icon>[0]["name"]} size={12} />
                 {s.label}
               </Link>
             );
           })}
         </div>
 
-        {/* VIP кнопка */}
-        <Link
-          to="/club"
-          className="flex-shrink-0 flex items-center gap-1.5 px-3 py-1 rounded-lg text-[11px] font-semibold border border-[#FFD700]/40 text-[#FFD700] bg-[#FFD700]/5 hover:bg-[#FFD700]/15 hover:border-[#FFD700]/70 hover:shadow-[0_0_10px_rgba(255,215,0,0.25)] transition-all duration-200"
-        >
-          <Icon name="Crown" size={11} />
-          <span className="hidden sm:inline">В клуб</span>
-        </Link>
+        {/* Правые кнопки */}
+        <div className="flex items-center gap-1.5 flex-shrink-0">
+          <a
+            href="https://t.me/RTrader11"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs border border-white/15 text-white/50 hover:text-white hover:border-white/30 transition-all duration-200"
+          >
+            <Icon name="Send" size={12} />
+            <span className="hidden sm:inline">TG</span>
+          </a>
+          <Link
+            to="/club"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-[#FFD700]/40 text-[#FFD700] bg-[#FFD700]/5 hover:bg-[#FFD700]/15 hover:border-[#FFD700]/70 hover:shadow-[0_0_10px_rgba(255,215,0,0.25)] transition-all duration-200"
+          >
+            <Icon name="Crown" size={12} />
+            <span className="hidden sm:inline">В клуб</span>
+          </Link>
+        </div>
       </div>
     </div>
   );

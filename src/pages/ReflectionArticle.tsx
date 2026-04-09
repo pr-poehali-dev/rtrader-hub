@@ -62,7 +62,7 @@ export default function ReflectionArticle() {
       {/* OLD NAV — для отката раскомментируй и убери HubNav */}
       <HubNav />
 
-      <div className="pt-11 pb-20 container mx-auto px-4 max-w-2xl">
+      <div className="pt-12 pb-20 container mx-auto px-4 max-w-2xl">
         {/* Обложка — object-contain чтобы не обрезать */}
         {article.image_url && (
           <div className="w-full rounded-2xl overflow-hidden mb-8 border border-white/10 bg-white/3 flex items-center justify-center">

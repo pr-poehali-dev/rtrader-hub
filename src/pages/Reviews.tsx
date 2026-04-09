@@ -44,7 +44,7 @@ export default function Reviews() {
       {/* OLD NAV — для отката раскомментируй и убери HubNav */}
       <HubNav />
 
-      <div className="pt-11 pb-16 container mx-auto px-4 max-w-6xl">
+      <div className="pt-12 pb-16 container mx-auto px-4 max-w-6xl">
         {/* Header */}
         <div className="mb-10">
           <div className="flex items-center gap-3 mb-4">

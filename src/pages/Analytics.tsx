@@ -45,7 +45,7 @@ export default function Analytics() {
     <div className="neon-grid-bg min-h-screen text-white font-montserrat">
       <HubNav />
 
-      <div className="pt-11 pb-16 container mx-auto px-4 max-w-5xl">
+      <div className="pt-12 pb-16 container mx-auto px-4 max-w-5xl">
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#FFD700] to-[#FF8C00] flex items-center justify-center shadow-lg flex-shrink-0">

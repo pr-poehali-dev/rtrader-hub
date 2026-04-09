@@ -14,7 +14,7 @@ export default function Vip() {
       {/* OLD NAV — для отката раскомментируй и убери HubNav */}
       <HubNav />
 
-      <div className="pt-11 pb-16 container mx-auto px-4 max-w-5xl">
+      <div className="pt-12 pb-16 container mx-auto px-4 max-w-5xl">
         {/* Hero */}
         <div className="text-center mb-14">
           <div
