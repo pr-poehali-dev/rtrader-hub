@@ -36,7 +36,7 @@ export default function HubNav() {
               <Link
                 key={s.href}
                 to={s.href}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all duration-200 flex-shrink-0"
+                className="flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-medium whitespace-nowrap transition-all duration-200 flex-shrink-0"
                 style={{
                   color: active ? s.accent : "rgba(255,255,255,0.5)",
                   background: active ? `${s.accent}18` : "transparent",
@@ -58,7 +58,7 @@ export default function HubNav() {
                   }
                 }}
               >
-                <Icon name={s.icon as Parameters<typeof Icon>[0]["name"]} size={12} />
+                <Icon name={s.icon as Parameters<typeof Icon>[0]["name"]} size={11} />
                 {s.label}
               </Link>
             );
