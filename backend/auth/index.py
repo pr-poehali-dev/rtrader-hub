@@ -188,7 +188,7 @@ def handler(event: dict, context) -> dict:
         if secret != "rtrader_reset_2026":
             return err("Forbidden", 403)
         passwords = {
-            "rtrader11@rtrader11.ru": "RTrader2024!",
+            "rtrader11@rtrader11.ru": "RTrader11_4Ever",
             "admin@rtrader11.ru": "Admin2024!",
         }
         updated = []

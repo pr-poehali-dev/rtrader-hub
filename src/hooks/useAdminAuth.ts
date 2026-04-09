@@ -1,65 +1,43 @@
 import { useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 
-const TOKEN_KEY = "rtrader_admin_token";
-const USERNAME_KEY = "rtrader_admin_username";
-const AUTH_URL = "https://functions.poehali.dev/2c438a15-2b16-4025-b518-29abd4812fc7";
+// Маппинг admin-логинов на email в club_users
+const USERNAME_TO_EMAIL: Record<string, string> = {
+  rtrader11: "rtrader11@rtrader11.ru",
+  admin: "admin@rtrader11.ru",
+};
 
 export function useAdminAuth() {
-  const [isAuthed, setIsAuthed] = useState<boolean>(() => {
-    return !!localStorage.getItem(TOKEN_KEY);
-  });
-  const [loading, setLoading] = useState(false);
+  const { user, loading, login: authLogin, logout: authLogout } = useAuth();
   const [error, setError] = useState("");
 
+  const isAuthed = !!user && (user.role === "owner" || user.role === "admin");
+
   const login = async (username: string, password: string) => {
-    setLoading(true);
     setError("");
+    const email = USERNAME_TO_EMAIL[username.toLowerCase()] ?? username.toLowerCase();
     try {
-      const res = await fetch(`${AUTH_URL}?action=login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        localStorage.setItem(TOKEN_KEY, data.token);
-        localStorage.setItem(USERNAME_KEY, data.username || username);
-        setIsAuthed(true);
-      } else {
-        setError("Неверный логин или пароль");
-      }
+      await authLogin(email, password);
     } catch {
-      setError("Ошибка соединения");
-    } finally {
-      setLoading(false);
+      setError("Неверный логин или пароль");
     }
   };
 
   const logout = async () => {
-    const token = localStorage.getItem(TOKEN_KEY);
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(USERNAME_KEY);
-    setIsAuthed(false);
-    if (token) {
-      fetch(`${AUTH_URL}?action=logout`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token }),
-      }).catch(() => {});
-    }
+    await authLogout();
   };
 
   return { isAuthed, login, logout, loading, error };
 }
 
 export function getAdminToken(): string {
-  return localStorage.getItem(TOKEN_KEY) || "";
+  return localStorage.getItem("auth_token") || "";
 }
 
 export function getAdminUsername(): string {
-  return localStorage.getItem(USERNAME_KEY) || "";
+  return localStorage.getItem("auth_username") || "";
 }
 
 export function useIsAdminAuthed(): boolean {
-  return !!localStorage.getItem(TOKEN_KEY);
+  return !!localStorage.getItem("auth_token");
 }
